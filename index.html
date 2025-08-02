@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>รายการสาขา</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <style>
+    body {
+      font-family: 'Prompt', sans-serif;
+      background-color: #f0f4f8;
+      margin: 0;
+      padding: 20px;
+    }
+    #searchContainer {
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      margin-bottom: 20px;
+      gap: 10px;
+    }
+    #searchInput, #statusFilter {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    #searchInput {
+      width: 100%;
+      max-width: 300px;
+    }
+    #statusFilter {
+      width: 150px;
+    }
+    .table-container {
+      overflow-x: auto;
+      width: 100%;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      overflow: hidden;
+      min-width: 900px;
+      border: 1px solid #ccc;
+    }
+    th, td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #e0e0e0;
+      border-right: 1px solid #ccc;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    th {
+      background-color: #007bff;
+      color: white;
+    }
+    th.sortable:hover {
+      background-color: #0056b3;
+    }
+    th .arrow {
+      display: inline-block;
+      margin-left: 5px;
+    }
+    th.asc .arrow::after {
+      content: '↑';
+    }
+    th.desc .arrow::after {
+      content: '↓';
+    }
+    th:nth-child(1), td:nth-child(1) { width: 100px; min-width: 80px; } /* สถานะ */
+    th:nth-child(2), td:nth-child(2) { width: 120px; min-width: 100px; } /* รหัสสาขา */
+    th:nth-child(3), td:nth-child(3) { width: 250px; min-width: 200px; } /* สาขา */
+    th:nth-child(4), td:nth-child(4) { width: 150px; min-width: 120px; } /* จังหวัด */
+    th:nth-child(5), td:nth-child(5) { width: 100px; min-width: 80px; } /* จำนวนเครื่อง */
+    th:nth-child(6), td:nth-child(6) { width: 100px; min-width: 80px; } /* เก็บแล้ว */
+    th:nth-child(7), td:nth-child(7) { width: 100px; min-width: 80px; } /* ผ่านมา */
+    th:nth-child(8), td:nth-child(8) { width: 120px; min-width: 100px; } /* กำหนดเก็บ */
+    th:nth-child(9), td:nth-child(9) { width: 150px; min-width: 120px; } /* ผู้ส่งคืน */
+    th:nth-child(10), td:nth-child(10) { width: 120px; min-width: 100px; } /* ดูรายละเอียด */
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+    .status-green {
+      color: green;
+      font-weight: bold;
+    }
+    .status-red {
+      color: red;
+      font-weight: bold;
+    }
+    .detail-button {
+      padding: 6px 10px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .detail-button:hover {
+      background-color: #2980b9;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 12px;
+      width: 80%;
+      max-width: 500px;
+      animation: zoomIn 0.4s ease;
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close:hover {
+      color: #000;
+    }
+    #modalContent span.label {
+      color: #007bff;
+      font-weight: bold;
+    }
+    #modalContent span.value {
+      color: #000;
+    }
+    .pagination {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      margin-top: 20px;
+    }
+    .pagination button,
+    .pagination select {
+      padding: 8px 12px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      margin: 0 5px;
+      transition: all 0.3s ease;
+    }
+    .pagination button:hover,
+    .pagination select:hover {
+      background-color: #2980b9;
+    }
+    .pagination .page-number {
+      width: 36px;
+      height: 36px;
+      background-color: #3498db;
+      color: white;
+      border-radius: 50%;
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 5px;
+      cursor: pointer;
+      font-size: 16px;
+      border: none;
+      transition: background-color 0.3s, transform 0.3s;
+    }
+    .pagination .page-number:hover {
+      background-color: #2980b9;
+      transform: scale(1.1);
+    }
+    .pagination .page-number.active {
+      background-color: #e67e22;
+      color: white;
+    }
+    .pagination img {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+    .items-per-page {
+      margin-left: 10px;
+      font-size: 16px;
+    }
+    tr {
+      opacity: 0;
+      transform: translateY(10px);
+      animation: fadeInUp 0.5s ease forwards;
+    }
+    tr:nth-child(even) {
+      animation-delay: 0.1s;
+    }
+    tr:nth-child(odd) {
+      animation-delay: 0.2s;
+    }
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    @keyframes zoomIn {
+      from {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="searchContainer">
+    <select id="statusFilter">
+      <option value="">ทุกสถานะ</option>
+      <option value="รอส่ง">รอส่ง</option>
+      <option value="ครบ">ครบ</option>
+      <option value="ไม่ครบ">ไม่ครบ</option>
+    </select>
+    <input type="text" id="searchInput" placeholder="ค้นหา รหัสสาขา, สาขา, จังหวัด หรือ ผู้ส่งคืน..." />
+  </div>
+  <div class="table-container">
+    <table id="data-table">
+      <thead>
+        <tr>
+          <th class="sortable" data-column="Staus">สถานะ <span class="arrow"></span></th>
+          <th class="sortable" data-column="รหัสสาขา">รหัสสาขา <span class="arrow"></span></th>
+          <th class="sortable" data-column="สาขา">สาขา <span class="arrow"></span></th>
+          <th class="sortable" data-column="จังหวัด">จังหวัด <span class="arrow"></span></th>
+          <th class="sortable" data-column="จำนวนเครื่อง">จำนวนเครื่อง <span class="arrow"></span></th>
+          <th class="sortable" data-column="เก็บแล้ว">เก็บแล้ว <span class="arrow"></span></th>
+          <th class="sortable" data-column="ผ่านมา">ผ่านมา <span class="arrow"></span></th>
+          <th class="sortable" data-column="DateCall">DateCall <span class="arrow"></span></th>
+          <th class="sortable" data-column="ผู้ส่งคืน">ผู้ส่งคืน <span class="arrow"></span></th>
+          <th>ดูรายละเอียด</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div id="detailModal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="closeModal">&times;</span>
+      <h2>รายละเอียด</h2>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <div class="pagination">
+    <button id="firstPage"><i class="fas fa-chevron-left"></i><i class="fas fa-chevron-left"></i></button>
+    <button id="prevPage"><i class="fas fa-chevron-left"></i></button>
+    <div id="pageNumbers"></div>
+    <button id="nextPage"><i class="fas fa-chevron-right"></i></button>
+    <button id="lastPage"><i class="fas fa-chevron-right"></i><i class="fas fa-chevron-right"></i></button>
+    <div class="items-per-page">
+      <label for="itemsPerPage">รายการต่อหน้า:</label>
+      <select id="itemsPerPage">
+        <option value="10">10 รายการ</option>
+        <option value="20">20 รายการ</option>
+        <option value="30">30 รายการ</option>
+      </select>
+    </div>
+  </div>
+
+  <script>
+    const sheetID = '1AfChl2ikkXb7FQJn72h-CvfIq8tKTb2ERz9z3WVK1KY';
+    const sheetName = 'TscBrand';
+    const url = `https://opensheet.elk.sh/${sheetID}/${sheetName}`;
+
+    const modal = document.getElementById("detailModal");
+    const modalContent = document.getElementById("modalContent");
+    const closeModal = document.getElementById("closeModal");
+    const searchInput = document.getElementById("searchInput");
+    const statusFilter = document.getElementById("statusFilter");
+    const tableBody = document.querySelector("#data-table tbody");
+    const pageNumbersContainer = document.getElementById("pageNumbers");
+    const firstPageButton = document.getElementById("firstPage");
+    const prevPageButton = document.getElementById("prevPage");
+    const nextPageButton = document.getElementById("nextPage");
+    const lastPageButton = document.getElementById("lastPage");
+    const itemsPerPageSelect = document.getElementById("itemsPerPage");
+
+    let allData = [];
+    let currentPage = 1;
+    let itemsPerPage = parseInt(itemsPerPageSelect.value);
+    let sortColumn = null;
+    let sortDirection = 'asc';
+
+    // ฟังก์ชันคำนวณจำนวนวันที่ผ่านมา
+    function calculateDaysPassed(dateCall, userKeep) {
+      if (!dateCall || userKeep) return "";
+      const date = new Date(dateCall);
+      if (isNaN(date)) return "";
+      const year = date.getFullYear();
+      const adjustedDate = year > 2500 ? new Date(year - 543, date.getMonth(), date.getDate()) : date;
+      const today = new Date();
+      const diffTime = Math.abs(adjustedDate - today);
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      return `${diffDays} วัน`;
+    }
+
+    // ฟังก์ชันเรียงลำดับข้อมูล
+    function sortData(data, column, direction) {
+      return [...data].sort((a, b) => {
+        let valueA = column === "ผ่านมา" ? calculateDaysPassed(a["DateCall"], a["ผู้ส่งคืน"]) : a[column] || "";
+        let valueB = column === "ผ่านมา" ? calculateDaysPassed(b["DateCall"], b["ผู้ส่งคืน"]) : b[column] || "";
+        
+        // แปลงเป็นตัวเลขสำหรับคอลัมน์จำนวนเครื่องและเก็บแล้ว
+        if (column === "จำนวนเครื่อง" || column === "เก็บแล้ว") {
+          valueA = parseFloat(valueA) || 0;
+          valueB = parseFloat(valueB) || 0;
+        }
+        // แปลงวันที่สำหรับ DateCall
+        else if (column === "DateCall") {
+          valueA = new Date(valueA).getTime() || 0;
+          valueB = new Date(valueB).getTime() || 0;
+        }
+        // แปลงวันที่ผ่านมาสำหรับคอลัมน์ผ่านมา
+        else if (column === "ผ่านมา") {
+          valueA = parseInt(valueA) || 0;
+          valueB = parseInt(valueB) || 0;
+        }
+        
+        if (valueA < valueB) return direction === 'asc' ? -1 : 1;
+        if (valueA > valueB) return direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+
+    closeModal.onclick = () => modal.style.display = "none";
+    window.onclick = event => {
+      if (event.target == modal) modal.style.display = "none";
+    };
+
+    itemsPerPageSelect.addEventListener("change", (e) => {
+      itemsPerPage = parseInt(e.target.value);
+      currentPage = 1;
+      filterAndRenderTable();
+    });
+
+    // เพิ่ม event listener สำหรับการเรียงลำดับ
+    document.querySelectorAll('.sortable').forEach(th => {
+      th.addEventListener('click', () => {
+        const column = th.getAttribute('data-column');
+        if (sortColumn === column) {
+          sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+          sortColumn = column;
+          sortDirection = 'asc';
+        }
+        
+        // อัปเดตลูกศร
+        document.querySelectorAll('.sortable').forEach(t => t.classList.remove('asc', 'desc'));
+        th.classList.add(sortDirection);
+        
+        filterAndRenderTable();
+      });
+    });
+
+    function filterAndRenderTable() {
+      const keyword = searchInput.value.toLowerCase();
+      const status = statusFilter.value;
+
+      let filtered = allData.filter(row => {
+        const matchesKeyword = (
+          (row["รหัสสาขา"] || "").toLowerCase().includes(keyword) ||
+          (row["สาขา"] || "").toLowerCase().includes(keyword) ||
+          (row["จังหวัด"] || "").toLowerCase().includes(keyword) ||
+          (row["ผู้ส่งคืน"] || "").toLowerCase().includes(keyword)
+        );
+        const matchesStatus = status ? row["Staus"] === status : true;
+        return matchesKeyword && matchesStatus;
+      });
+
+      // เรียงลำดับข้อมูลถ้ามีการเลือกคอลัมน์
+      if (sortColumn) {
+        filtered = sortData(filtered, sortColumn, sortDirection);
+      }
+
+      currentPage = 1;
+      renderTable(filtered);
+    }
+
+    searchInput.addEventListener("input", filterAndRenderTable);
+    statusFilter.addEventListener("change", filterAndRenderTable);
+
+    function renderTable(data) {
+      tableBody.innerHTML = '';
+      const startIdx = (currentPage - 1) * itemsPerPage;
+      const endIdx = startIdx + itemsPerPage;
+      const paginatedData = data.slice(startIdx, endIdx);
+
+      paginatedData.forEach((row, i) => {
+        const tr = document.createElement("tr");
+        tr.style.animationDelay = `${i * 0.05}s`;
+
+        const columns = ["Staus", "รหัสสาขา", "สาขา", "จังหวัด", "จำนวนเครื่อง", "เก็บแล้ว", "ผ่านมา", "DateCall", "ผู้ส่งคืน"];
+        columns.forEach(col => {
+          const td = document.createElement("td");
+          if (col === "ผ่านมา") {
+            td.textContent = calculateDaysPassed(row["DateCall"], row["ผู้ส่งคืน"]);
+          } else if (col === "Staus") {
+            td.textContent = row[col] || "";
+            td.className = row[col] === "ครบ" ? "status-green" : "status-red";
+          } else {
+            td.textContent = row[col] || "";
+          }
+          tr.appendChild(td);
+        });
+
+        const detailTd = document.createElement("td");
+        const btn = document.createElement("button");
+        btn.textContent = "ดูรายละเอียด";
+        btn.className = "detail-button";
+        btn.onclick = () => {
+          modalContent.innerHTML = columns.map(col => {
+            const label = col === "Staus" ? "สถานะ" : col === "จำนวนเครื่อง" ? "จำนวนเครื่อง" : col === "เก็บแล้ว" ? "เก็บแล้ว" : col === "ผู้ส่งคืน" ? "ผู้ส่งคืน" : col;
+            const value = col === "ผ่านมา" ? calculateDaysPassed(row["DateCall"], row["ผู้ส่งคืน"]) : row[col] || "";
+            return `<div><span class='label'>${label}:</span> <span class='value'>${value}</span></div>`;
+          }).join('');
+          modal.style.display = "block";
+        };
+        detailTd.appendChild(btn);
+        tr.appendChild(detailTd);
+
+        tableBody.appendChild(tr);
+      });
+      updatePagination(data);
+    }
+
+    function updatePagination(data) {
+      const totalPages = Math.ceil(data.length / itemsPerPage);
+      pageNumbersContainer.innerHTML = '';
+
+      const startPage = Math.max(1, currentPage - 1);
+      const endPage = Math.min(totalPages, currentPage + 2);
+
+      for (let i = startPage; i <= endPage; i++) {
+        const pageNumberButton = document.createElement("button");
+        pageNumberButton.className = `page-number ${i === currentPage ? 'active' : ''}`;
+        pageNumberButton.textContent = i;
+        pageNumberButton.onclick = () => {
+          currentPage = i;
+          filterAndRenderTable();
+        };
+        pageNumbersContainer.appendChild(pageNumberButton);
+      }
+    }
+
+    firstPageButton.onclick = () => {
+      currentPage = 1;
+      filterAndRenderTable();
+    };
+
+    prevPageButton.onclick = () => {
+      if (currentPage > 1) {
+        currentPage--;
+        filterAndRenderTable();
+      }
+    };
+
+    nextPageButton.onclick = () => {
+      const totalPages = Math.ceil(allData.length / itemsPerPage);
+      if (currentPage < totalPages) {
+        currentPage++;
+        filterAndRenderTable();
+      }
+    };
+
+    lastPageButton.onclick = () => {
+      currentPage = Math.ceil(allData.length / itemsPerPage);
+      filterAndRenderTable();
+    };
+
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        allData = data.map(row => ({
+          ...row,
+          "จำนวนเครื่อง": row["PosQty"],
+          "เก็บแล้ว": row["PoskeepQty"],
+          "ผู้ส่งคืน": row["UserKeep"],
+          "ผ่านมา": calculateDaysPassed(row["DateCall"], row["UserKeep"])
+        }));
+        filterAndRenderTable();
+      })
+      .catch(error => {
+        console.error("ไม่สามารถโหลดข้อมูลได้:", error);
+      });
+  </script>
+</body>
+</html>
