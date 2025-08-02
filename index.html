@@ -32,7 +32,7 @@
       margin-bottom: 10px;
       gap: 10px;
     }
-    #searchInput, #statusFilter {
+    #searchInput, #statusFilter, #exportExcel {
       padding: 10px;
       border-radius: 8px;
       border: 1px solid #ccc;
@@ -44,6 +44,16 @@
     }
     #statusFilter {
       width: 150px;
+    }
+    #exportExcel {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    #exportExcel:hover {
+      background-color: #218838;
     }
     #statusSummary {
       margin: 10px 0;
@@ -263,7 +273,7 @@
 </head>
 <body>
   <div id="headerTitle">
-    รายงานแสดงการเก็บเครื่อง TSC ร้านปิดถาวร, Renovate,ย้าย Pos,คืนคลังสินค้าทั่วประเทศ
+   รายงานแสดงการเก็บเครื่อง TSC ร้านปิดถาวร, Renovate,ย้าย Pos,คืนคลังสินค้าทั่วประเทศ
   </div>
   <div id="searchContainer">
     <select id="statusFilter">
@@ -273,6 +283,7 @@
       <option value="ไม่ครบ">ไม่ครบ</option>
     </select>
     <input type="text" id="searchInput" placeholder="ค้นหา รหัสสาขา, สาขา, จังหวัด หรือ ผู้ส่งคืน..." />
+    <button id="exportExcel">Excel</button>
   </div>
   <div id="statusSummary">
     <div class="status-waiting">สถานะ รอส่งคลัง: <span id="waitingCount">0</span> สาขา</div>
@@ -333,6 +344,7 @@
     const closeModal = document.getElementById("closeModal");
     const searchInput = document.getElementById("searchInput");
     const statusFilter = document.getElementById("statusFilter");
+    const exportExcelButton = document.getElementById("exportExcel");
     const tableBody = document.querySelector("#data-table tbody");
     const pageNumbersContainer = document.getElementById("pageNumbers");
     const firstPageButton = document.getElementById("firstPage");
@@ -388,6 +400,26 @@
       });
     }
 
+    // ฟังก์ชันส่งออกข้อมูลเป็น CSV
+    function exportToCSV(data) {
+      const headers = ["สถานะ", "รหัสสาขา", "สาขา", "จังหวัด", "จำนวนเครื่อง", "เก็บแล้ว", "ผ่านมา(วัน)", "DateCall", "ผู้ส่งคืน"];
+      const rows = data.map(row => 
+        headers.map(header => `"${(row[header] || "").toString().replace(/"/g, '""')}"`).join(',')
+      );
+      const csvContent = [
+        headers.join(','),
+        ...rows
+      ].join('\n');
+      
+      const bom = '\uFEFF'; // เพิ่ม BOM เพื่อให้ Excel รองรับ UTF-8
+      const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'TscBrandData.csv';
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+
     closeModal.onclick = () => modal.style.display = "none";
     window.onclick = event => {
       if (event.target == modal) modal.style.display = "none";
@@ -397,6 +429,25 @@
       itemsPerPage = parseInt(e.target.value);
       currentPage = 1;
       filterAndRenderTable();
+    });
+
+    exportExcelButton.addEventListener("click", () => {
+      const keyword = searchInput.value.toLowerCase();
+      const status = statusFilter.value;
+      let filtered = allData.filter(row => {
+        const matchesKeyword = (
+          (row["รหัสสาขา"] || "").toLowerCase().includes(keyword) ||
+          (row["สาขา"] || "").toLowerCase().includes(keyword) ||
+          (row["จังหวัด"] || "").toLowerCase().includes(keyword) ||
+          (row["ผู้ส่งคืน"] || "").toLowerCase().includes(keyword)
+        );
+        const matchesStatus = status ? row["Staus"] === status : true;
+        return matchesKeyword && matchesStatus;
+      });
+      if (sortColumn) {
+        filtered = sortData(filtered, sortColumn, sortDirection);
+      }
+      exportToCSV(filtered);
     });
 
     // เพิ่ม event listener สำหรับการเรียงลำดับ
@@ -459,7 +510,7 @@
         columns.forEach(col => {
           const td = document.createElement("td");
           if (col === "Staus") {
-            td.textContent = row[col] || "";
+            td.textContent = row[col] || "ไม่มีข้อมูล";
             td.className = row[col] === "ครบ" ? "status-green" : "status-red";
           } else {
             td.textContent = row[col] || "";
@@ -474,7 +525,7 @@
         btn.onclick = () => {
           modalContent.innerHTML = columns.map(col => {
             const label = col === "Staus" ? "สถานะ" : col === "จำนวนเครื่อง" ? "จำนวนเครื่อง" : col === "เก็บแล้ว" ? "เก็บแล้ว" : col === "ผู้ส่งคืน" ? "ผู้ส่งคืน" : col === "ผ่านมา(วัน)" ? "ผ่านมา(วัน)" : col;
-            const value = row[col] || "";
+            const value = row[col] || (col === "Staus" ? "ไม่มีข้อมูล" : "");
             return `<div><span class='label'>${label}:</span> <span class='value'>${value}</span></div>`;
           }).join('');
           modal.style.display = "block";
@@ -534,17 +585,20 @@
     fetch(url)
       .then(response => response.json())
       .then(data => {
+        console.log("ข้อมูลจาก Sheet:", data); // เพิ่มการบันทึกเพื่อตรวจสอบข้อมูล
         allData = data.map(row => ({
           ...row,
-          "จำนวนเครื่อง": row["PosQty"],
-          "เก็บแล้ว": row["PoskeepQty"],
-          "ผู้ส่งคืน": row["UserKeep"],
-          "ผ่านมา(วัน)": row["ผ่านมา"] || ""
+          "จำนวนเครื่อง": row["PosQty"] || "",
+          "เก็บแล้ว": row["PoskeepQty"] || "",
+          "ผู้ส่งคืน": row["UserKeep"] || "",
+          "ผ่านมา(วัน)": row["ผ่านมา"] || "",
+          "Staus": row["Staus"] || ""
         }));
         filterAndRenderTable();
       })
       .catch(error => {
         console.error("ไม่สามารถโหลดข้อมูลได้:", error);
+        alert("เกิดข้อผิดพลาดในการโหลดข้อมูลจาก Sheet. กรุณาตรวจสอบ Sheet ID หรือการเชื่อมต่อ.");
       });
   </script>
 </body>
