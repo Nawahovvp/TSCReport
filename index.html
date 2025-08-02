@@ -58,7 +58,7 @@
       margin: 5px 0;
     }
     #statusSummary .status-waiting {
-      color: #e74c3c; /* สีแดงสำหรับรอส่ง */
+      color: #e74c3c; /* สีแดงสำหรับรอส่งคลัง */
     }
     #statusSummary .status-complete {
       color: #2ecc71; /* สีเขียวสำหรับครบ */
@@ -263,19 +263,19 @@
 </head>
 <body>
   <div id="headerTitle">
-    รายงานแสดงการเก็บเครื่อง TSC ร้านปิดถาวร ,Renovate, ยกเลิก Pos, คืน Thai Smart Card ทั่วประเทศ
+    รายงานแสดงการเก็บเครื่อง TSC ร้านปิดถาวร, Renovate,ย้าย Pos,คืนคลังสินค้าทั่วประเทศ
   </div>
   <div id="searchContainer">
     <select id="statusFilter">
       <option value="">ทุกสถานะ</option>
-      <option value="รอส่ง">รอส่ง</option>
+      <option value="รอส่งคลัง">รอส่งคลัง</option>
       <option value="ครบ">ครบ</option>
       <option value="ไม่ครบ">ไม่ครบ</option>
     </select>
     <input type="text" id="searchInput" placeholder="ค้นหา รหัสสาขา, สาขา, จังหวัด หรือ ผู้ส่งคืน..." />
   </div>
   <div id="statusSummary">
-    <div class="status-waiting">สถานะ รอส่ง: <span id="waitingCount">0</span> สาขา</div>
+    <div class="status-waiting">สถานะ รอส่งคลัง: <span id="waitingCount">0</span> สาขา</div>
     <div class="status-complete">สถานะ ครบ: <span id="completeCount">0</span> สาขา</div>
     <div class="status-incomplete">สถานะ ไม่ครบ: <span id="incompleteCount">0</span> สาขา</div>
   </div>
@@ -352,7 +352,7 @@
 
     // ฟังก์ชันคำนวณสรุปสถานะ
     function updateStatusSummary(data) {
-      const waiting = data.filter(row => row["Staus"] === "รอส่ง").length;
+      const waiting = data.filter(row => row["Staus"] === "รอส่งคลัง").length;
       const complete = data.filter(row => row["Staus"] === "ครบ").length;
       const incomplete = data.filter(row => row["Staus"] === "ไม่ครบ").length;
       waitingCount.textContent = waiting;
