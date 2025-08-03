@@ -120,9 +120,9 @@
     th:nth-child(3), td:nth-child(3) { width: 250px; min-width: 200px; } /* สาขา */
     th:nth-child(4), td:nth-child(4) { width: 150px; min-width: 120px; } /* จังหวัด */
     th:nth-child(5), td:nth-child(5) { width: 150px; min-width: 120px; } /* Remark */
-    th:nth-child(6), td:nth-child(6) { width: 100px; min-width: 80px; } /* จำนวนเครื่อง */
-    th:nth-child(7), td:nth-child(7) { width: 100px; min-width: 80px; } /* เก็บแล้ว */
-    th:nth-child(8), td:nth-child(8) { width: 100px; min-width: 80px; } /* ผ่านมา(วัน) */
+    th:nth-child(6), td:nth-child(6) { width: 100px; min-width: 80px; text-align: center; } /* จำนวนเครื่อง */
+    th:nth-child(7), td:nth-child(7) { width: 100px; min-width: 80px; text-align: center; } /* เก็บแล้ว */
+    th:nth-child(8), td:nth-child(8) { width: 100px; min-width: 80px; text-align: center; } /* ผ่านมา(วัน) */
     th:nth-child(9), td:nth-child(9) { width: 120px; min-width: 100px; } /* DateCall */
     th:nth-child(10), td:nth-child(10) { width: 150px; min-width: 120px; } /* ผู้ส่งคืน */
     th:nth-child(11), td:nth-child(11) { width: 120px; min-width: 100px; } /* ดูรายละเอียด */
@@ -364,6 +364,26 @@
     let sortColumn = null;
     let sortDirection = 'asc';
 
+    // ฟังก์ชันแปลงวันที่ให้อยู่ในรูปแบบที่ JavaScript รู้จัก
+    function parseDate(dateStr) {
+      if (!dateStr || dateStr.trim() === "") return null;
+      // รองรับรูปแบบวันที่ที่อาจพบ เช่น DD/MM/YYYY, YYYY-MM-DD
+      const parts = dateStr.includes('/') ? dateStr.split('/') : dateStr.split('-');
+      if (parts.length === 3) {
+        // สมมติว่ารูปแบบเป็น DD/MM/YYYY หรือ DD-MM-YYYY
+        if (dateStr.includes('/')) {
+          const [day, month, year] = parts.map(Number);
+          return new Date(year, month - 1, day);
+        }
+        // สมมติว่ารูปแบบเป็น YYYY-MM-DD
+        else {
+          const [year, month, day] = parts.map(Number);
+          return new Date(year, month - 1, day);
+        }
+      }
+      return null; // คืนค่า null หากวันที่ไม่ถูกต้อง
+    }
+
     // ฟังก์ชันคำนวณสรุปสถานะ
     function updateStatusSummary(data) {
       const waiting = data.filter(row => row["Staus"] === "รอส่งคลัง").length;
@@ -387,8 +407,14 @@
         }
         // แปลงวันที่สำหรับ DateCall
         else if (column === "DateCall") {
-          valueA = new Date(valueA).getTime() || 0;
-          valueB = new Date(valueB).getTime() || 0;
+          const dateA = parseDate(valueA);
+          const dateB = parseDate(valueB);
+          // จัดการกรณีวันที่ว่างหรือไม่ถูกต้อง
+          if (!dateA && !dateB) return 0;
+          if (!dateA) return direction === 'asc' ? 1 : -1;
+          if (!dateB) return direction === 'asc' ? -1 : 1;
+          valueA = dateA.getTime();
+          valueB = dateB.getTime();
         }
         // แปลงวันที่ผ่านมาสำหรับคอลัมน์ผ่านมา(วัน)
         else if (column === "ผ่านมา(วัน)") {
@@ -406,7 +432,15 @@
     function exportToCSV(data) {
       const headers = ["สถานะ", "รหัสสาขา", "สาขา", "จังหวัด", "Remark", "จำนวนเครื่อง", "เก็บแล้ว", "ผ่านมา(วัน)", "DateCall", "ผู้ส่งคืน"];
       const rows = data.map(row => 
-        headers.map(header => `"${(row[header] || "").toString().replace(/"/g, '""')}"`).join(',')
+        headers.map(header => {
+          let value = row[header] || "";
+          if (header === "จำนวนเครื่อง" || header === "เก็บแล้ว") {
+            value = parseFloat(value) === 0 ? "-" : value;
+          } else if (header === "ผ่านมา(วัน)") {
+            value = parseInt(value.replace(" วัน", "")) === 0 ? "-" : value;
+          }
+          return `"${value.toString().replace(/"/g, '""')}"`;
+        }).join(',')
       );
       const csvContent = [
         headers.join(','),
@@ -513,11 +547,16 @@
         const columns = ["Staus", "รหัสสาขา", "สาขา", "จังหวัด", "Remark", "จำนวนเครื่อง", "เก็บแล้ว", "ผ่านมา(วัน)", "DateCall", "ผู้ส่งคืน"];
         columns.forEach(col => {
           const td = document.createElement("td");
+          let value = row[col] || "";
           if (col === "Staus") {
-            td.textContent = row[col] || "ไม่มีข้อมูล";
-            td.className = row[col] === "ครบ" ? "status-green" : "status-red";
+            td.textContent = value || "ไม่มีข้อมูล";
+            td.className = value === "ครบ" ? "status-green" : "status-red";
+          } else if (col === "จำนวนเครื่อง" || col === "เก็บแล้ว") {
+            td.textContent = parseFloat(value) === 0 ? "-" : value;
+          } else if (col === "ผ่านมา(วัน)") {
+            td.textContent = parseInt(value.replace(" วัน", "")) === 0 ? "-" : value;
           } else {
-            td.textContent = row[col] || "";
+            td.textContent = value;
           }
           tr.appendChild(td);
         });
@@ -529,7 +568,12 @@
         btn.onclick = () => {
           modalContent.innerHTML = columns.map(col => {
             const label = col === "Staus" ? "สถานะ" : col === "จำนวนเครื่อง" ? "จำนวนเครื่อง" : col === "เก็บแล้ว" ? "เก็บแล้ว" : col === "ผู้ส่งคืน" ? "ผู้ส่งคืน" : col === "ผ่านมา(วัน)" ? "ผ่านมา(วัน)" : col;
-            const value = row[col] || (col === "Staus" ? "ไม่มีข้อมูล" : "");
+            let value = row[col] || (col === "Staus" ? "ไม่มีข้อมูล" : "");
+            if (col === "จำนวนเครื่อง" || col === "เก็บแล้ว") {
+              value = parseFloat(value) === 0 ? "-" : value;
+            } else if (col === "ผ่านมา(วัน)") {
+              value = parseInt(value.replace(" วัน", "")) === 0 ? "-" : value;
+            }
             return `<div><span class='label'>${label}:</span> <span class='value'>${value}</span></div>`;
           }).join('');
           modal.style.display = "block";
