@@ -119,12 +119,13 @@
     th:nth-child(2), td:nth-child(2) { width: 120px; min-width: 100px; } /* รหัสสาขา */
     th:nth-child(3), td:nth-child(3) { width: 250px; min-width: 200px; } /* สาขา */
     th:nth-child(4), td:nth-child(4) { width: 150px; min-width: 120px; } /* จังหวัด */
-    th:nth-child(5), td:nth-child(5) { width: 100px; min-width: 80px; } /* จำนวนเครื่อง */
-    th:nth-child(6), td:nth-child(6) { width: 100px; min-width: 80px; } /* เก็บแล้ว */
-    th:nth-child(7), td:nth-child(7) { width: 100px; min-width: 80px; } /* ผ่านมา(วัน) */
-    th:nth-child(8), td:nth-child(8) { width: 120px; min-width: 100px; } /* DateCall */
-    th:nth-child(9), td:nth-child(9) { width: 150px; min-width: 120px; } /* ผู้ส่งคืน */
-    th:nth-child(10), td:nth-child(10) { width: 120px; min-width: 100px; } /* ดูรายละเอียด */
+    th:nth-child(5), td:nth-child(5) { width: 150px; min-width: 120px; } /* Remark */
+    th:nth-child(6), td:nth-child(6) { width: 100px; min-width: 80px; } /* จำนวนเครื่อง */
+    th:nth-child(7), td:nth-child(7) { width: 100px; min-width: 80px; } /* เก็บแล้ว */
+    th:nth-child(8), td:nth-child(8) { width: 100px; min-width: 80px; } /* ผ่านมา(วัน) */
+    th:nth-child(9), td:nth-child(9) { width: 120px; min-width: 100px; } /* DateCall */
+    th:nth-child(10), td:nth-child(10) { width: 150px; min-width: 120px; } /* ผู้ส่งคืน */
+    th:nth-child(11), td:nth-child(11) { width: 120px; min-width: 100px; } /* ดูรายละเอียด */
     tr:hover {
       background-color: #f1f1f1;
     }
@@ -298,6 +299,7 @@
           <th class="sortable" data-column="รหัสสาขา">รหัสสาขา <span class="arrow"></span></th>
           <th class="sortable" data-column="สาขา">สาขา <span class="arrow"></span></th>
           <th class="sortable" data-column="จังหวัด">จังหวัด <span class="arrow"></span></th>
+          <th class="sortable" data-column="Remark">Remark <span class="arrow"></span></th>
           <th class="sortable" data-column="จำนวนเครื่อง">จำนวนเครื่อง <span class="arrow"></span></th>
           <th class="sortable" data-column="เก็บแล้ว">เก็บแล้ว <span class="arrow"></span></th>
           <th class="sortable" data-column="ผ่านมา(วัน)">ผ่านมา(วัน) <span class="arrow"></span></th>
@@ -402,7 +404,7 @@
 
     // ฟังก์ชันส่งออกข้อมูลเป็น CSV
     function exportToCSV(data) {
-      const headers = ["สถานะ", "รหัสสาขา", "สาขา", "จังหวัด", "จำนวนเครื่อง", "เก็บแล้ว", "ผ่านมา(วัน)", "DateCall", "ผู้ส่งคืน"];
+      const headers = ["สถานะ", "รหัสสาขา", "สาขา", "จังหวัด", "Remark", "จำนวนเครื่อง", "เก็บแล้ว", "ผ่านมา(วัน)", "DateCall", "ผู้ส่งคืน"];
       const rows = data.map(row => 
         headers.map(header => `"${(row[header] || "").toString().replace(/"/g, '""')}"`).join(',')
       );
@@ -439,7 +441,8 @@
           (row["รหัสสาขา"] || "").toLowerCase().includes(keyword) ||
           (row["สาขา"] || "").toLowerCase().includes(keyword) ||
           (row["จังหวัด"] || "").toLowerCase().includes(keyword) ||
-          (row["ผู้ส่งคืน"] || "").toLowerCase().includes(keyword)
+          (row["ผู้ส่งคืน"] || "").toLowerCase().includes(keyword) ||
+          (row["Remark"] || "").toLowerCase().includes(keyword)
         );
         const matchesStatus = status ? row["Staus"] === status : true;
         return matchesKeyword && matchesStatus;
@@ -478,7 +481,8 @@
           (row["รหัสสาขา"] || "").toLowerCase().includes(keyword) ||
           (row["สาขา"] || "").toLowerCase().includes(keyword) ||
           (row["จังหวัด"] || "").toLowerCase().includes(keyword) ||
-          (row["ผู้ส่งคืน"] || "").toLowerCase().includes(keyword)
+          (row["ผู้ส่งคืน"] || "").toLowerCase().includes(keyword) ||
+          (row["Remark"] || "").toLowerCase().includes(keyword)
         );
         const matchesStatus = status ? row["Staus"] === status : true;
         return matchesKeyword && matchesStatus;
@@ -506,7 +510,7 @@
         const tr = document.createElement("tr");
         tr.style.animationDelay = `${i * 0.05}s`;
 
-        const columns = ["Staus", "รหัสสาขา", "สาขา", "จังหวัด", "จำนวนเครื่อง", "เก็บแล้ว", "ผ่านมา(วัน)", "DateCall", "ผู้ส่งคืน"];
+        const columns = ["Staus", "รหัสสาขา", "สาขา", "จังหวัด", "Remark", "จำนวนเครื่อง", "เก็บแล้ว", "ผ่านมา(วัน)", "DateCall", "ผู้ส่งคืน"];
         columns.forEach(col => {
           const td = document.createElement("td");
           if (col === "Staus") {
@@ -592,7 +596,8 @@
           "เก็บแล้ว": row["PoskeepQty"] || "",
           "ผู้ส่งคืน": row["UserKeep"] || "",
           "ผ่านมา(วัน)": row["ผ่านมา"] || "",
-          "Staus": row["Staus"] || ""
+          "Staus": row["Staus"] || "",
+          "Remark": row["Remark"] || ""
         }));
         filterAndRenderTable();
       })
