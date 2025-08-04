@@ -687,7 +687,7 @@
                       <td>${tscRow["รหัสสาขา"] || ""}</td>
                       <td>${tscRow["TID"] || ""}</td>
                       <td>${tscRow["PosNo"] || ""}</td>
-                      <td>${tscRow["Status"] || ""}</td>
+                      <td class="${tscRow["Status"] === "รอส่งคืน" ? "status-red" : tscRow["Status"] === "ส่งคืนแล้ว" ? "status-green" : ""}">${tscRow["Status"] || ""}</td>
                     </tr>
                   `).join('')}
                 </tbody>
