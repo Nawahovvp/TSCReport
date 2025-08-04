@@ -121,11 +121,12 @@
     th:nth-child(4), td:nth-child(4) { width: 150px; min-width: 120px; } /* จังหวัด */
     th:nth-child(5), td:nth-child(5) { width: 150px; min-width: 120px; } /* Remark */
     th:nth-child(6), td:nth-child(6) { width: 100px; min-width: 80px; text-align: center; } /* จำนวนเครื่อง */
-    th:nth-child(7), td:nth-child(7) { width: 100px; min-width: 80px; text-align: center; } /* เก็บแล้ว */
+    th:nth-child(7), td:nth-child(7) { width: 100px; min-width: 80px; text-align: center; } /* ส่งคืน */
     th:nth-child(8), td:nth-child(8) { width: 100px; min-width: 80px; text-align: center; } /* ผ่านมา(วัน) */
-    th:nth-child(9), td:nth-child(9) { width: 120px; min-width: 100px; } /* DateCall */
+    th:nth-child(9), td:nth-child(9) { width: 120px; min-width: 100px; } /* วันที่ดำเนินการ */
     th:nth-child(10), td:nth-child(10) { width: 150px; min-width: 120px; } /* ผู้ส่งคืน */
-    th:nth-child(11), td:nth-child(11) { width: 120px; min-width: 100px; } /* ดูรายละเอียด */
+    th:nth-child(11), td:nth-child(11) { width: 120px; min-width: 100px; } /* วันที่คืนคลัง */
+    th:nth-child(12), td:nth-child(12) { width: 120px; min-width: 100px; } /* ดูรายละเอียด */
     tr:hover {
       background-color: #f1f1f1;
     }
@@ -171,15 +172,32 @@
       max-width: 500px;
       animation: zoomIn 0.4s ease;
     }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
     .close {
       color: #aaa;
-      float: right;
       font-size: 24px;
       font-weight: bold;
       cursor: pointer;
     }
     .close:hover {
       color: #000;
+    }
+    .print-button {
+      background-color: #555;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 12px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .print-button:hover {
+      background-color: #333;
     }
     #modalContent span.label {
       color: #007bff;
@@ -270,11 +288,16 @@
         transform: scale(1);
       }
     }
+    @media print {
+      .print-button, .close {
+        display: none;
+      }
+    }
   </style>
 </head>
 <body>
   <div id="headerTitle">
-   รายงานแสดงการเก็บเครื่อง TSC ร้านปิดถาวร, Renovate,ย้าย Pos,คืนคลังสินค้าทั่วประเทศ
+    รายงานแสดงการเก็บเครื่อง TSC ร้านปิดถาวร, Renovate,ย้าย Pos,คืนคลังสินค้าทั่วประเทศ
   </div>
   <div id="searchContainer">
     <select id="statusFilter">
@@ -301,10 +324,11 @@
           <th class="sortable" data-column="จังหวัด">จังหวัด <span class="arrow"></span></th>
           <th class="sortable" data-column="Remark">Remark <span class="arrow"></span></th>
           <th class="sortable" data-column="จำนวนเครื่อง">จำนวนเครื่อง <span class="arrow"></span></th>
-          <th class="sortable" data-column="เก็บแล้ว">เก็บแล้ว <span class="arrow"></span></th>
+          <th class="sortable" data-column="ส่งคืน">ส่งคืน <span class="arrow"></span></th>
           <th class="sortable" data-column="ผ่านมา(วัน)">ผ่านมา(วัน) <span class="arrow"></span></th>
-          <th class="sortable" data-column="DateCall">DateCall <span class="arrow"></span></th>
+          <th class="sortable" data-column="วันที่ดำเนินการ">วันที่ดำเนินการ <span class="arrow"></span></th>
           <th class="sortable" data-column="ผู้ส่งคืน">ผู้ส่งคืน <span class="arrow"></span></th>
+          <th class="sortable" data-column="วันที่คืนคลัง">วันที่คืนคลัง <span class="arrow"></span></th>
           <th>ดูรายละเอียด</th>
         </tr>
       </thead>
@@ -314,8 +338,13 @@
 
   <div id="detailModal" class="modal">
     <div class="modal-content">
-      <span class="close" id="closeModal">&times;</span>
-      <h2>รายละเอียด</h2>
+      <div class="modal-header">
+        <h2>ใบคืนเครื่อง TSC</h2>
+        <div>
+          <button class="print-button" onclick="window.print()"><i class="fas fa-print"></i></button>
+          <span class="close" id="closeModal">&times;</span>
+        </div>
+      </div>
       <div id="modalContent"></div>
     </div>
   </div>
@@ -367,21 +396,17 @@
     // ฟังก์ชันแปลงวันที่ให้อยู่ในรูปแบบที่ JavaScript รู้จัก
     function parseDate(dateStr) {
       if (!dateStr || dateStr.trim() === "") return null;
-      // รองรับรูปแบบวันที่ที่อาจพบ เช่น DD/MM/YYYY, YYYY-MM-DD
       const parts = dateStr.includes('/') ? dateStr.split('/') : dateStr.split('-');
       if (parts.length === 3) {
-        // สมมติว่ารูปแบบเป็น DD/MM/YYYY หรือ DD-MM-YYYY
         if (dateStr.includes('/')) {
           const [day, month, year] = parts.map(Number);
           return new Date(year, month - 1, day);
-        }
-        // สมมติว่ารูปแบบเป็น YYYY-MM-DD
-        else {
+        } else {
           const [year, month, day] = parts.map(Number);
           return new Date(year, month - 1, day);
         }
       }
-      return null; // คืนค่า null หากวันที่ไม่ถูกต้อง
+      return null;
     }
 
     // ฟังก์ชันคำนวณสรุปสถานะ
@@ -400,24 +425,18 @@
         let valueA = a[column] || "";
         let valueB = b[column] || "";
         
-        // แปลงเป็นตัวเลขสำหรับคอลัมน์จำนวนเครื่องและเก็บแล้ว
-        if (column === "จำนวนเครื่อง" || column === "เก็บแล้ว") {
+        if (column === "จำนวนเครื่อง" || column === "ส่งคืน") {
           valueA = parseFloat(valueA) || 0;
           valueB = parseFloat(valueB) || 0;
-        }
-        // แปลงวันที่สำหรับ DateCall
-        else if (column === "DateCall") {
+        } else if (column === "วันที่ดำเนินการ" || column === "วันที่คืนคลัง") {
           const dateA = parseDate(valueA);
           const dateB = parseDate(valueB);
-          // จัดการกรณีวันที่ว่างหรือไม่ถูกต้อง
           if (!dateA && !dateB) return 0;
           if (!dateA) return direction === 'asc' ? 1 : -1;
           if (!dateB) return direction === 'asc' ? -1 : 1;
           valueA = dateA.getTime();
           valueB = dateB.getTime();
-        }
-        // แปลงวันที่ผ่านมาสำหรับคอลัมน์ผ่านมา(วัน)
-        else if (column === "ผ่านมา(วัน)") {
+        } else if (column === "ผ่านมา(วัน)") {
           valueA = parseInt(valueA.replace(" วัน", "")) || 0;
           valueB = parseInt(valueB.replace(" วัน", "")) || 0;
         }
@@ -430,11 +449,11 @@
 
     // ฟังก์ชันส่งออกข้อมูลเป็น CSV
     function exportToCSV(data) {
-      const headers = ["สถานะ", "รหัสสาขา", "สาขา", "จังหวัด", "Remark", "จำนวนเครื่อง", "เก็บแล้ว", "ผ่านมา(วัน)", "DateCall", "ผู้ส่งคืน"];
+      const headers = ["สถานะ", "รหัสสาขา", "สาขา", "จังหวัด", "Remark", "จำนวนเครื่อง", "ส่งคืน", "ผ่านมา(วัน)", "วันที่ดำเนินการ", "ผู้ส่งคืน", "วันที่คืนคลัง"];
       const rows = data.map(row => 
         headers.map(header => {
           let value = row[header] || "";
-          if (header === "จำนวนเครื่อง" || header === "เก็บแล้ว") {
+          if (header === "จำนวนเครื่อง" || header === "ส่งคืน") {
             value = parseFloat(value) === 0 ? "-" : value;
           } else if (header === "ผ่านมา(วัน)") {
             value = parseInt(value.replace(" วัน", "")) === 0 ? "-" : value;
@@ -447,7 +466,7 @@
         ...rows
       ].join('\n');
       
-      const bom = '\uFEFF'; // เพิ่ม BOM เพื่อให้ Excel รองรับ UTF-8
+      const bom = '\uFEFF';
       const blob = new Blob([bom + csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
@@ -476,7 +495,8 @@
           (row["สาขา"] || "").toLowerCase().includes(keyword) ||
           (row["จังหวัด"] || "").toLowerCase().includes(keyword) ||
           (row["ผู้ส่งคืน"] || "").toLowerCase().includes(keyword) ||
-          (row["Remark"] || "").toLowerCase().includes(keyword)
+          (row["Remark"] || "").toLowerCase().includes(keyword) ||
+          (row["วันที่คืนคลัง"] || "").toLowerCase().includes(keyword)
         );
         const matchesStatus = status ? row["Staus"] === status : true;
         return matchesKeyword && matchesStatus;
@@ -487,7 +507,6 @@
       exportToCSV(filtered);
     });
 
-    // เพิ่ม event listener สำหรับการเรียงลำดับ
     document.querySelectorAll('.sortable').forEach(th => {
       th.addEventListener('click', () => {
         const column = th.getAttribute('data-column');
@@ -498,7 +517,6 @@
           sortDirection = 'asc';
         }
         
-        // อัปเดตลูกศร
         document.querySelectorAll('.sortable').forEach(t => t.classList.remove('asc', 'desc'));
         th.classList.add(sortDirection);
         
@@ -516,13 +534,13 @@
           (row["สาขา"] || "").toLowerCase().includes(keyword) ||
           (row["จังหวัด"] || "").toLowerCase().includes(keyword) ||
           (row["ผู้ส่งคืน"] || "").toLowerCase().includes(keyword) ||
-          (row["Remark"] || "").toLowerCase().includes(keyword)
+          (row["Remark"] || "").toLowerCase().includes(keyword) ||
+          (row["วันที่คืนคลัง"] || "").toLowerCase().includes(keyword)
         );
         const matchesStatus = status ? row["Staus"] === status : true;
         return matchesKeyword && matchesStatus;
       });
 
-      // เรียงลำดับข้อมูลถ้ามีการเลือกคอลัมน์
       if (sortColumn) {
         filtered = sortData(filtered, sortColumn, sortDirection);
       }
@@ -544,14 +562,14 @@
         const tr = document.createElement("tr");
         tr.style.animationDelay = `${i * 0.05}s`;
 
-        const columns = ["Staus", "รหัสสาขา", "สาขา", "จังหวัด", "Remark", "จำนวนเครื่อง", "เก็บแล้ว", "ผ่านมา(วัน)", "DateCall", "ผู้ส่งคืน"];
+        const columns = ["Staus", "รหัสสาขา", "สาขา", "จังหวัด", "Remark", "จำนวนเครื่อง", "ส่งคืน", "ผ่านมา(วัน)", "วันที่ดำเนินการ", "ผู้ส่งคืน", "วันที่คืนคลัง"];
         columns.forEach(col => {
           const td = document.createElement("td");
           let value = row[col] || "";
           if (col === "Staus") {
             td.textContent = value || "ไม่มีข้อมูล";
             td.className = value === "ครบ" ? "status-green" : "status-red";
-          } else if (col === "จำนวนเครื่อง" || col === "เก็บแล้ว") {
+          } else if (col === "จำนวนเครื่อง" || col === "ส่งคืน") {
             td.textContent = parseFloat(value) === 0 ? "-" : value;
           } else if (col === "ผ่านมา(วัน)") {
             td.textContent = parseInt(value.replace(" วัน", "")) === 0 ? "-" : value;
@@ -567,9 +585,9 @@
         btn.className = "detail-button";
         btn.onclick = () => {
           modalContent.innerHTML = columns.map(col => {
-            const label = col === "Staus" ? "สถานะ" : col === "จำนวนเครื่อง" ? "จำนวนเครื่อง" : col === "เก็บแล้ว" ? "เก็บแล้ว" : col === "ผู้ส่งคืน" ? "ผู้ส่งคืน" : col === "ผ่านมา(วัน)" ? "ผ่านมา(วัน)" : col;
+            const label = col === "Staus" ? "สถานะ" : col === "จำนวนเครื่อง" ? "จำนวนเครื่อง" : col === "ส่งคืน" ? "ส่งคืน" : col === "ผู้ส่งคืน" ? "ผู้ส่งคืน" : col === "ผ่านมา(วัน)" ? "ผ่านมา(วัน)" : col === "วันที่คืนคลัง" ? "วันที่คืนคลัง" : col === "วันที่ดำเนินการ" ? "วันที่ดำเนินการ" : col;
             let value = row[col] || (col === "Staus" ? "ไม่มีข้อมูล" : "");
-            if (col === "จำนวนเครื่อง" || col === "เก็บแล้ว") {
+            if (col === "จำนวนเครื่อง" || col === "ส่งคืน") {
               value = parseFloat(value) === 0 ? "-" : value;
             } else if (col === "ผ่านมา(วัน)") {
               value = parseInt(value.replace(" วัน", "")) === 0 ? "-" : value;
@@ -633,15 +651,17 @@
     fetch(url)
       .then(response => response.json())
       .then(data => {
-        console.log("ข้อมูลจาก Sheet:", data); // เพิ่มการบันทึกเพื่อตรวจสอบข้อมูล
+        console.log("ข้อมูลจาก Sheet:", data);
         allData = data.map(row => ({
           ...row,
           "จำนวนเครื่อง": row["PosQty"] || "",
-          "เก็บแล้ว": row["PoskeepQty"] || "",
+          "ส่งคืน": row["PoskeepQty"] || "",
           "ผู้ส่งคืน": row["UserKeep"] || "",
           "ผ่านมา(วัน)": row["ผ่านมา"] || "",
           "Staus": row["Staus"] || "",
-          "Remark": row["Remark"] || ""
+          "Remark": row["Remark"] || "",
+          "วันที่คืนคลัง": row["DateRecripte"] || "",
+          "วันที่ดำเนินการ": row["DateCall"] || ""
         }));
         filterAndRenderTable();
       })
