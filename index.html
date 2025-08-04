@@ -619,10 +619,13 @@
           (row["Remark"] || "").toLowerCase().includes(keyword) ||
           (row["วันที่คืนคลัง"] || "").toLowerCase().includes(keyword)
         );
-        const matchesStatus = status ? row["Staus"] === status : true;
+        const rowStatus = row["Staus"] || ""; // Default to empty string if undefined
+        const matchesStatus = !status || rowStatus === status; // Include all if status is empty
+        console.log("Filtering with status:", status, "Row status:", rowStatus, "Matches:", matchesStatus);
         return matchesKeyword && matchesStatus;
       });
 
+      console.log("Filtered data length:", filtered.length, "Sample:", filtered.slice(0, 2));
       if (sortColumn) {
         filtered = sortData(filtered, sortColumn, sortDirection);
       }
@@ -775,7 +778,7 @@
           "ส่งคืน": row["PoskeepQty"] || "",
           "ผู้ส่งคืน": row["UserKeep"] || "",
           "ผ่านมา(วัน)": row["ผ่านมา"] || "",
-          "Staus": row["Staus"] || "",
+          "Staus": (row["Staus"] || "").trim(), // Normalize Staus value
           "Remark": row["Remark"] || "",
           "วันที่คืนคลัง": row["DateRecripte"] || "",
           "วันที่ดำเนินการ": row["DateCall"] || ""
