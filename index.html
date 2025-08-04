@@ -226,7 +226,8 @@
     .modal-table th:nth-child(1), .modal-table td:nth-child(1) { width: 100px; min-width: 80px; } /* รหัสสาขา */
     .modal-table th:nth-child(2), .modal-table td:nth-child(2) { width: 120px; min-width: 100px; } /* TID */
     .modal-table th:nth-child(3), .modal-table td:nth-child(3) { width: 80px; min-width: 60px; } /* PosNo */
-    .modal-table th:nth-child(4), .modal-table td:nth-child(4) { width: 100px; min-width: 80px; } /* Status */
+    .modal-table th:nth-child(4), .modal-table td:nth-child(4) { width: 120px; min-width: 100px; } /* วันที่ส่งคืน */
+    .modal-table th:nth-child(5), .modal-table td:nth-child(5) { width: 100px; min-width: 80px; } /* Status */
     .modal-table tr:hover {
       background-color: #f1f1f1;
     }
@@ -361,7 +362,8 @@
       .modal-table th:nth-child(1), .modal-table td:nth-child(1) { width: 30mm; min-width: 20mm; } /* รหัสสาขา */
       .modal-table th:nth-child(2), .modal-table td:nth-child(2) { width: 40mm; min-width: 30mm; } /* TID */
       .modal-table th:nth-child(3), .modal-table td:nth-child(3) { width: 25mm; min-width: 15mm; } /* PosNo */
-      .modal-table th:nth-child(4), .modal-table td:nth-child(4) { width: 30mm; min-width: 20mm; } /* Status */
+      .modal-table th:nth-child(4), .modal-table td:nth-child(4) { width: 40mm; min-width: 30mm; } /* วันที่ส่งคืน */
+      .modal-table th:nth-child(5), .modal-table td:nth-child(5) { width: 30mm; min-width: 20mm; } /* Status */
       #modalContent > div {
         margin-bottom: 2mm;
         font-size: 10pt;
@@ -580,7 +582,7 @@
           (row["Remark"] || "").toLowerCase().includes(keyword) ||
           (row["วันที่คืนคลัง"] || "").toLowerCase().includes(keyword)
         );
-        const matchesStatus = status ? row["Staus"] === status : true;
+        const matchesStatus = !status || (row["Staus"] || "") === status;
         return matchesKeyword && matchesStatus;
       });
       if (sortColumn) {
@@ -621,11 +623,9 @@
         );
         const rowStatus = row["Staus"] || ""; // Default to empty string if undefined
         const matchesStatus = !status || rowStatus === status; // Include all if status is empty
-        console.log("Filtering with status:", status, "Row status:", rowStatus, "Matches:", matchesStatus);
         return matchesKeyword && matchesStatus;
       });
 
-      console.log("Filtered data length:", filtered.length, "Sample:", filtered.slice(0, 2));
       if (sortColumn) {
         filtered = sortData(filtered, sortColumn, sortDirection);
       }
@@ -681,6 +681,7 @@
                     <th>รหัสสาขา</th>
                     <th>TID</th>
                     <th>PosNo</th>
+                    <th>วันที่ส่งคืน</th>
                     <th>Status</th>
                   </tr>
                 </thead>
@@ -690,6 +691,7 @@
                       <td>${tscRow["รหัสสาขา"] || ""}</td>
                       <td>${tscRow["TID"] || ""}</td>
                       <td>${tscRow["PosNo"] || ""}</td>
+                      <td>${tscRow["DateRecripte"] || ""}</td>
                       <td class="${tscRow["Status"] === "รอส่งคืน" ? "status-red" : tscRow["Status"] === "ส่งคืนแล้ว" ? "status-green" : ""}">${tscRow["Status"] || ""}</td>
                     </tr>
                   `).join('')}
@@ -787,6 +789,7 @@
           "รหัสสาขา": row["รหัสสาขา"] || "",
           "TID": row["TID"] || "",
           "PosNo": row["PosNo"] || "",
+          "DateRecripte": row["DateRecripte"] || "",
           "Status": row["Status"] || ""
         }));
         filterAndRenderTable();
