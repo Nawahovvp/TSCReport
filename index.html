@@ -169,7 +169,7 @@
       padding: 20px;
       border-radius: 12px;
       width: 80%;
-      max-width: 500px;
+      max-width: 600px;
       animation: zoomIn 0.4s ease;
     }
     .modal-header {
@@ -205,6 +205,31 @@
     }
     #modalContent span.value {
       color: #000;
+    }
+    .modal-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      border: 1px solid #ccc;
+    }
+    .modal-table th, .modal-table td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #e0e0e0;
+      border-right: 1px solid #ccc;
+    }
+    .modal-table th {
+      background-color: #007bff;
+      color: white;
+    }
+    .modal-table tr:hover {
+      background-color: #f1f1f1;
+    }
+    .no-data {
+      margin-top: 20px;
+      color: #e74c3c;
+      font-weight: bold;
+      text-align: center;
     }
     .pagination {
       display: flex;
@@ -368,7 +393,9 @@
   <script>
     const sheetID = '1AfChl2ikkXb7FQJn72h-CvfIq8tKTb2ERz9z3WVK1KY';
     const sheetName = 'TscBrand';
+    const tscDataSheetName = 'TSCData';
     const url = `https://opensheet.elk.sh/${sheetID}/${sheetName}`;
+    const tscDataUrl = `https://opensheet.elk.sh/${sheetID}/${tscDataSheetName}`;
 
     const modal = document.getElementById("detailModal");
     const modalContent = document.getElementById("modalContent");
@@ -388,6 +415,7 @@
     const incompleteCount = document.getElementById("incompleteCount");
 
     let allData = [];
+    let tscData = [];
     let currentPage = 1;
     let itemsPerPage = parseInt(itemsPerPageSelect.value);
     let sortColumn = null;
@@ -584,6 +612,37 @@
         btn.textContent = "ดูรายละเอียด";
         btn.className = "detail-button";
         btn.onclick = () => {
+          const branchCode = row["รหัสสาขา"] || "";
+          const filteredTscData = tscData.filter(tscRow => tscRow["รหัสสาขา"] === branchCode);
+
+          let tscTableHtml = '';
+          if (filteredTscData.length > 0) {
+            tscTableHtml = `
+              <table class="modal-table">
+                <thead>
+                  <tr>
+                    <th>รหัสสาขา</th>
+                    <th>TID</th>
+                    <th>PosNo</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${filteredTscData.map(tscRow => `
+                    <tr>
+                      <td>${tscRow["รหัสสาขา"] || ""}</td>
+                      <td>${tscRow["TID"] || ""}</td>
+                      <td>${tscRow["PosNo"] || ""}</td>
+                      <td>${tscRow["Status"] || ""}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            `;
+          } else {
+            tscTableHtml = '<div class="no-data">ไม่มีข้อมูลใน TSCData สำหรับรหัสสาขานี้</div>';
+          }
+
           modalContent.innerHTML = columns.map(col => {
             const label = col === "Staus" ? "สถานะ" : col === "จำนวนเครื่อง" ? "จำนวนเครื่อง" : col === "ส่งคืน" ? "ส่งคืน" : col === "ผู้ส่งคืน" ? "ผู้ส่งคืน" : col === "ผ่านมา(วัน)" ? "ผ่านมา(วัน)" : col === "วันที่คืนคลัง" ? "วันที่คืนคลัง" : col === "วันที่ดำเนินการ" ? "วันที่ดำเนินการ" : col;
             let value = row[col] || (col === "Staus" ? "ไม่มีข้อมูล" : "");
@@ -593,7 +652,7 @@
               value = parseInt(value.replace(" วัน", "")) === 0 ? "-" : value;
             }
             return `<div><span class='label'>${label}:</span> <span class='value'>${value}</span></div>`;
-          }).join('');
+          }).join('') + tscTableHtml;
           modal.style.display = "block";
         };
         detailTd.appendChild(btn);
@@ -648,11 +707,15 @@
       filterAndRenderTable();
     };
 
-    fetch(url)
-      .then(response => response.json())
-      .then(data => {
-        console.log("ข้อมูลจาก Sheet:", data);
-        allData = data.map(row => ({
+    // Fetch data from both sheets
+    Promise.all([
+      fetch(url).then(response => response.json()),
+      fetch(tscDataUrl).then(response => response.json())
+    ])
+      .then(([brandData, tscDataResponse]) => {
+        console.log("ข้อมูลจาก TscBrand:", brandData);
+        console.log("ข้อมูลจาก TSCData:", tscDataResponse);
+        allData = brandData.map(row => ({
           ...row,
           "จำนวนเครื่อง": row["PosQty"] || "",
           "ส่งคืน": row["PoskeepQty"] || "",
@@ -662,6 +725,12 @@
           "Remark": row["Remark"] || "",
           "วันที่คืนคลัง": row["DateRecripte"] || "",
           "วันที่ดำเนินการ": row["DateCall"] || ""
+        }));
+        tscData = tscDataResponse.map(row => ({
+          "รหัสสาขา": row["รหัสสาขา"] || "",
+          "TID": row["TID"] || "",
+          "PosNo": row["PosNo"] || "",
+          "Status": row["Status"] || ""
         }));
         filterAndRenderTable();
       })
