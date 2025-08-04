@@ -57,7 +57,7 @@
     }
     #statusSummary {
       margin: 10px 0;
-      padding: 10px;
+      padding: 10mm;
       background-color: #fff;
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -168,8 +168,8 @@
       margin: 10% auto;
       padding: 20px;
       border-radius: 12px;
-      width: 80%;
-      max-width: 600px;
+      width: 90%;
+      max-width: 900px;
       animation: zoomIn 0.4s ease;
     }
     .modal-header {
@@ -211,6 +211,7 @@
       border-collapse: collapse;
       margin-top: 20px;
       border: 1px solid #ccc;
+      overflow-x: auto;
     }
     .modal-table th, .modal-table td {
       padding: 8px;
@@ -222,6 +223,10 @@
       background-color: #007bff;
       color: white;
     }
+    .modal-table th:nth-child(1), .modal-table td:nth-child(1) { width: 100px; min-width: 80px; } /* รหัสสาขา */
+    .modal-table th:nth-child(2), .modal-table td:nth-child(2) { width: 120px; min-width: 100px; } /* TID */
+    .modal-table th:nth-child(3), .modal-table td:nth-child(3) { width: 80px; min-width: 60px; } /* PosNo */
+    .modal-table th:nth-child(4), .modal-table td:nth-child(4) { width: 100px; min-width: 80px; } /* Status */
     .modal-table tr:hover {
       background-color: #f1f1f1;
     }
@@ -314,8 +319,57 @@
       }
     }
     @media print {
+      body {
+        margin: 0;
+      }
+      #headerTitle, #searchContainer, #statusSummary, .table-container, .pagination {
+        display: none;
+      }
+      .modal {
+        display: block;
+        position: static;
+        background-color: transparent;
+        width: 100%;
+        height: auto;
+      }
+      .modal-content {
+        margin: 0mm 5mm;
+        padding: 5mm;
+        width: auto;
+        max-width: 100%;
+        box-shadow: none;
+        border-radius: 0;
+      }
+      .modal-header {
+        margin-bottom: 5mm;
+      }
       .print-button, .close {
         display: none;
+      }
+      .modal-table {
+        width: 100%;
+        font-size: 10pt;
+        border-collapse: collapse;
+        overflow-x: auto;
+      }
+      .modal-table th, .modal-table td {
+        padding: 3mm;
+        word-wrap: break-word;
+        white-space: normal;
+        text-align: left;
+      }
+      .modal-table th:nth-child(1), .modal-table td:nth-child(1) { width: 30mm; min-width: 20mm; } /* รหัสสาขา */
+      .modal-table th:nth-child(2), .modal-table td:nth-child(2) { width: 40mm; min-width: 30mm; } /* TID */
+      .modal-table th:nth-child(3), .modal-table td:nth-child(3) { width: 25mm; min-width: 15mm; } /* PosNo */
+      .modal-table th:nth-child(4), .modal-table td:nth-child(4) { width: 30mm; min-width: 20mm; } /* Status */
+      #modalContent > div {
+        margin-bottom: 2mm;
+        font-size: 10pt;
+        text-align: left;
+      }
+      .no-data {
+        font-size: 10pt;
+        text-align: left;
       }
     }
   </style>
