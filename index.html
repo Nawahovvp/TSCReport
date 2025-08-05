@@ -399,10 +399,10 @@
     <button id="exportExcel">Excel</button>
   </div>
   <div id="statusSummary">
-    <div class="status-waiting">สถานะ รอส่งคลัง: <span id="waitingCount">0</span> สาขา</div>
-    <div class="status-complete">สถานะ ครบ: <span id="completeCount">0</span> สาขา</div>
-    <div class="status-incomplete">สถานะ ไม่ครบ: <span id="incompleteCount">0</span> สาขา</div>
-    <div class="status-pending">สถานะ รอจัดเก็บ: <span id="pendingCount">0</span> สาขา</div>
+    <div class="status-waiting">สถานะ รอส่งคลัง: <span id="waitingCount">0</span> สาขา จำนวน <span id="waitingPosCount">0</span> เครื่อง</div>
+    <div class="status-complete">สถานะ ครบ: <span id="completeCount">0</span> สาขา จำนวน <span id="completePosCount">0</span> เครื่อง</div>
+    <div class="status-incomplete">สถานะ ไม่ครบ: <span id="incompleteCount">0</span> สาขา จำนวน <span id="incompletePosCount">0</span> เครื่อง</div>
+    <div class="status-pending">สถานะ รอจัดเก็บ: <span id="pendingCount">0</span> สาขา จำนวน <span id="pendingPosCount">0</span> เครื่อง</div>
   </div>
   <div class="table-container">
     <table id="data-table">
@@ -479,6 +479,10 @@
     const completeCount = document.getElementById("completeCount");
     const incompleteCount = document.getElementById("incompleteCount");
     const pendingCount = document.getElementById("pendingCount");
+    const waitingPosCount = document.getElementById("waitingPosCount");
+    const completePosCount = document.getElementById("completePosCount");
+    const incompletePosCount = document.getElementById("incompletePosCount");
+    const pendingPosCount = document.getElementById("pendingPosCount");
 
     let allData = [];
     let tscData = [];
@@ -505,14 +509,30 @@
 
     // ฟังก์ชันคำนวณสรุปสถานะ
     function updateStatusSummary(data) {
-      const waiting = data.filter(row => row["Staus"] === "รอส่งคลัง").length;
-      const complete = data.filter(row => row["Staus"] === "ครบ").length;
-      const incomplete = data.filter(row => row["Staus"] === "ไม่ครบ").length;
-      const pending = data.filter(row => row["Staus"] === "รอจัดเก็บ").length;
-      waitingCount.textContent = waiting;
-      completeCount.textContent = complete;
-      incompleteCount.textContent = incomplete;
-      pendingCount.textContent = pending;
+      const waiting = data.filter(row => row["Staus"] === "รอส่งคลัง");
+      const complete = data.filter(row => row["Staus"] === "ครบ");
+      const incomplete = data.filter(row => row["Staus"] === "ไม่ครบ");
+      const pending = data.filter(row => row["Staus"] === "รอจัดเก็บ");
+
+      const waitingBranches = waiting.length;
+      const completeBranches = complete.length;
+      const incompleteBranches = incomplete.length;
+      const pendingBranches = pending.length;
+
+      const waitingPos = waiting.reduce((sum, row) => sum + (parseFloat(row["จำนวนเครื่อง"]) || 0), 0);
+      const completePos = complete.reduce((sum, row) => sum + (parseFloat(row["จำนวนเครื่อง"]) || 0), 0);
+      const incompletePos = incomplete.reduce((sum, row) => sum + (parseFloat(row["จำนวนเครื่อง"]) || 0), 0);
+      const pendingPos = pending.reduce((sum, row) => sum + (parseFloat(row["จำนวนเครื่อง"]) || 0), 0);
+
+      waitingCount.textContent = waitingBranches;
+      completeCount.textContent = completeBranches;
+      incompleteCount.textContent = incompleteBranches;
+      pendingCount.textContent = pendingBranches;
+
+      waitingPosCount.textContent = waitingPos;
+      completePosCount.textContent = completePos;
+      incompletePosCount.textContent = incompletePos;
+      pendingPosCount.textContent = pendingPos;
     }
 
     // ฟังก์ชันเรียงลำดับข้อมูล
