@@ -76,6 +76,9 @@
     #statusSummary .status-incomplete {
       color: #f1c40f; /* สีเหลืองสำหรับไม่ครบ */
     }
+    #statusSummary .status-pending {
+      color: #e67e22; /* สีส้มสำหรับรอจัดเก็บ */
+    }
     .table-container {
       overflow-x: auto;
       width: 100%;
@@ -136,6 +139,10 @@
     }
     .status-red {
       color: red;
+      font-weight: bold;
+    }
+    .status-orange {
+      color: #e67e22;
       font-weight: bold;
     }
     .detail-button {
@@ -386,6 +393,7 @@
       <option value="รอส่งคลัง">รอส่งคลัง</option>
       <option value="ครบ">ครบ</option>
       <option value="ไม่ครบ">ไม่ครบ</option>
+      <option value="รอจัดเก็บ">รอจัดเก็บ</option>
     </select>
     <input type="text" id="searchInput" placeholder="ค้นหา รหัสสาขา, สาขา, จังหวัด หรือ ผู้ส่งคืน..." />
     <button id="exportExcel">Excel</button>
@@ -394,6 +402,7 @@
     <div class="status-waiting">สถานะ รอส่งคลัง: <span id="waitingCount">0</span> สาขา</div>
     <div class="status-complete">สถานะ ครบ: <span id="completeCount">0</span> สาขา</div>
     <div class="status-incomplete">สถานะ ไม่ครบ: <span id="incompleteCount">0</span> สาขา</div>
+    <div class="status-pending">สถานะ รอจัดเก็บ: <span id="pendingCount">0</span> สาขา</div>
   </div>
   <div class="table-container">
     <table id="data-table">
@@ -469,6 +478,7 @@
     const waitingCount = document.getElementById("waitingCount");
     const completeCount = document.getElementById("completeCount");
     const incompleteCount = document.getElementById("incompleteCount");
+    const pendingCount = document.getElementById("pendingCount");
 
     let allData = [];
     let tscData = [];
@@ -498,9 +508,11 @@
       const waiting = data.filter(row => row["Staus"] === "รอส่งคลัง").length;
       const complete = data.filter(row => row["Staus"] === "ครบ").length;
       const incomplete = data.filter(row => row["Staus"] === "ไม่ครบ").length;
+      const pending = data.filter(row => row["Staus"] === "รอจัดเก็บ").length;
       waitingCount.textContent = waiting;
       completeCount.textContent = complete;
       incompleteCount.textContent = incomplete;
+      pendingCount.textContent = pending;
     }
 
     // ฟังก์ชันเรียงลำดับข้อมูล
@@ -621,8 +633,8 @@
           (row["Remark"] || "").toLowerCase().includes(keyword) ||
           (row["วันที่คืนคลัง"] || "").toLowerCase().includes(keyword)
         );
-        const rowStatus = row["Staus"] || ""; // Default to empty string if undefined
-        const matchesStatus = !status || rowStatus === status; // Include all if status is empty
+        const rowStatus = row["Staus"] || "";
+        const matchesStatus = !status || rowStatus === status;
         return matchesKeyword && matchesStatus;
       });
 
@@ -653,7 +665,7 @@
           let value = row[col] || "";
           if (col === "Staus") {
             td.textContent = value || "ไม่มีข้อมูล";
-            td.className = value === "ครบ" ? "status-green" : "status-red";
+            td.className = value === "ครบ" ? "status-green" : value === "รอจัดเก็บ" ? "status-orange" : "status-red";
           } else if (col === "จำนวนเครื่อง" || col === "ส่งคืน") {
             td.textContent = parseFloat(value) === 0 ? "-" : value;
           } else if (col === "ผ่านมา(วัน)") {
@@ -692,7 +704,7 @@
                       <td>${tscRow["TID"] || ""}</td>
                       <td>${tscRow["PosNo"] || ""}</td>
                       <td>${tscRow["DateRecripte"] || ""}</td>
-                      <td class="${tscRow["Status"] === "รอส่งคืน" ? "status-red" : tscRow["Status"] === "ส่งคืนแล้ว" ? "status-green" : ""}">${tscRow["Status"] || ""}</td>
+                      <td class="${tscRow["Status"] === "รอส่งคืน" ? "status-red" : tscRow["Status"] === "ส่งคืนแล้ว" ? "status-green" : tscRow["Status"] === "รอจัดเก็บ" ? "status-orange" : ""}">${tscRow["Status"] || ""}</td>
                     </tr>
                   `).join('')}
                 </tbody>
@@ -780,7 +792,7 @@
           "ส่งคืน": row["PoskeepQty"] || "",
           "ผู้ส่งคืน": row["UserKeep"] || "",
           "ผ่านมา(วัน)": row["ผ่านมา"] || "",
-          "Staus": (row["Staus"] || "").trim(), // Normalize Staus value
+          "Staus": (row["Staus"] || "").trim(),
           "Remark": row["Remark"] || "",
           "วันที่คืนคลัง": row["DateRecripte"] || "",
           "วันที่ดำเนินการ": row["DateCall"] || ""
