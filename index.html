@@ -32,7 +32,7 @@
       margin-bottom: 10px;
       gap: 10px;
     }
-    #searchInput, #statusFilter, #exportExcel {
+    #searchInput, #statusFilter, #exportExcel, #searchButton {
       padding: 10px;
       border-radius: 8px;
       border: 1px solid #ccc;
@@ -54,6 +54,20 @@
     }
     #exportExcel:hover {
       background-color: #218838;
+    }
+    #searchButton {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+    }
+    #searchButton:hover {
+      background-color: #0056b3;
     }
     #statusSummary {
       margin: 10px 0;
@@ -396,6 +410,7 @@
       <option value="รอจัดเก็บ">รอจัดเก็บ</option>
     </select>
     <input type="text" id="searchInput" placeholder="ค้นหา รหัสสาขา, สาขา, จังหวัด หรือ ผู้ส่งคืน..." />
+    <button id="searchButton"><i class="fas fa-search"></i></button>
     <button id="exportExcel">Excel</button>
   </div>
   <div id="statusSummary">
@@ -466,6 +481,7 @@
     const modalContent = document.getElementById("modalContent");
     const closeModal = document.getElementById("closeModal");
     const searchInput = document.getElementById("searchInput");
+    const searchButton = document.getElementById("searchButton");
     const statusFilter = document.getElementById("statusFilter");
     const exportExcelButton = document.getElementById("exportExcel");
     const tableBody = document.querySelector("#data-table tbody");
@@ -640,6 +656,8 @@
       });
     });
 
+    searchButton.addEventListener("click", filterAndRenderTable);
+
     function filterAndRenderTable() {
       const keyword = searchInput.value.toLowerCase();
       const status = statusFilter.value;
@@ -666,7 +684,6 @@
       renderTable(filtered);
     }
 
-    searchInput.addEventListener("input", filterAndRenderTable);
     statusFilter.addEventListener("change", filterAndRenderTable);
 
     function renderTable(data) {
@@ -833,6 +850,3 @@
   </script>
 </body>
 </html>
-
-
-
