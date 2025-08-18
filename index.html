@@ -82,16 +82,16 @@
       margin: 5px 0;
     }
     #statusSummary .status-waiting {
-      color: #e74c3c; /* สีแดงสำหรับรอส่งคลัง */
+      color: #e74c3c;
     }
     #statusSummary .status-complete {
-      color: #2ecc71; /* สีเขียวสำหรับครบ */
+      color: #2ecc71;
     }
     #statusSummary .status-incomplete {
-      color: #f1c40f; /* สีเหลืองสำหรับไม่ครบ */
+      color: #f1c40f;
     }
     #statusSummary .status-pending {
-      color: #e67e22; /* สีส้มสำหรับรอจัดเก็บ */
+      color: #e67e22;
     }
     .table-container {
       overflow-x: auto;
@@ -132,18 +132,18 @@
     th.desc .arrow::after {
       content: '↓';
     }
-    th:nth-child(1), td:nth-child(1) { width: 100px; min-width: 80px; } /* สถานะ */
-    th:nth-child(2), td:nth-child(2) { width: 120px; min-width: 100px; } /* รหัสสาขา */
-    th:nth-child(3), td:nth-child(3) { width: 250px; min-width: 200px; } /* สาขา */
-    th:nth-child(4), td:nth-child(4) { width: 150px; min-width: 120px; } /* จังหวัด */
-    th:nth-child(5), td:nth-child(5) { width: 150px; min-width: 120px; } /* Remark */
-    th:nth-child(6), td:nth-child(6) { width: 100px; min-width: 80px; text-align: center; } /* จำนวนเครื่อง */
-    th:nth-child(7), td:nth-child(7) { width: 100px; min-width: 80px; text-align: center; } /* ส่งคืน */
-    th:nth-child(8), td:nth-child(8) { width: 100px; min-width: 80px; text-align: center; } /* ผ่านมา(วัน) */
-    th:nth-child(9), td:nth-child(9) { width: 120px; min-width: 100px; } /* วันที่ดำเนินการ */
-    th:nth-child(10), td:nth-child(10) { width: 150px; min-width: 120px; } /* ผู้ส่งคืน */
-    th:nth-child(11), td:nth-child(11) { width: 120px; min-width: 100px; } /* วันที่คืนคลัง */
-    th:nth-child(12), td:nth-child(12) { width: 120px; min-width: 100px; } /* ดูรายละเอียด */
+    th:nth-child(1), td:nth-child(1) { width: 100px; min-width: 80px; }
+    th:nth-child(2), td:nth-child(2) { width: 120px; min-width: 100px; }
+    th:nth-child(3), td:nth-child(3) { width: 250px; min-width: 200px; }
+    th:nth-child(4), td:nth-child(4) { width: 150px; min-width: 120px; }
+    th:nth-child(5), td:nth-child(5) { width: 150px; min-width: 120px; } /* สถานะร้าน */
+    th:nth-child(6), td:nth-child(6) { width: 100px; min-width: 80px; text-align: center; }
+    th:nth-child(7), td:nth-child(7) { width: 100px; min-width: 80px; text-align: center; }
+    th:nth-child(8), td:nth-child(8) { width: 100px; min-width: 80px; text-align: center; }
+    th:nth-child(9), td:nth-child(9) { width: 120px; min-width: 100px; }
+    th:nth-child(10), td:nth-child(10) { width: 150px; min-width: 120px; }
+    th:nth-child(11), td:nth-child(11) { width: 120px; min-width: 100px; }
+    th:nth-child(12), td:nth-child(12) { width: 120px; min-width: 100px; }
     tr:hover {
       background-color: #f1f1f1;
     }
@@ -190,7 +190,7 @@
       padding: 20px;
       border-radius: 12px;
       width: 90%;
-      max-width: 900px;
+      max-width: 1200px; /* เพิ่มความกว้างจาก 900px เป็น 1200px */
       animation: zoomIn 0.4s ease;
     }
     .modal-header {
@@ -247,8 +247,11 @@
     .modal-table th:nth-child(1), .modal-table td:nth-child(1) { width: 100px; min-width: 80px; } /* รหัสสาขา */
     .modal-table th:nth-child(2), .modal-table td:nth-child(2) { width: 120px; min-width: 100px; } /* TID */
     .modal-table th:nth-child(3), .modal-table td:nth-child(3) { width: 80px; min-width: 60px; } /* PosNo */
-    .modal-table th:nth-child(4), .modal-table td:nth-child(4) { width: 120px; min-width: 100px; } /* วันที่ส่งคืน */
-    .modal-table th:nth-child(5), .modal-table td:nth-child(5) { width: 100px; min-width: 80px; } /* Status */
+    .modal-table th:nth-child(4), .modal-table td:nth-child(4) { width: 120px; min-width: 100px; } /* สถานะร้าน */
+    .modal-table th:nth-child(5), .modal-table td:nth-child(5) { width: 120px; min-width: 100px; } /* วันเข้าดำเนินการ */
+    .modal-table th:nth-child(6), .modal-table td:nth-child(6) { width: 120px; min-width: 100px; } /* วันที่ส่งคืน */
+    .modal-table th:nth-child(7), .modal-table td:nth-child(7) { width: 150px; min-width: 120px; } /* ผู้ส่งคืน */
+    .modal-table th:nth-child(8), .modal-table td:nth-child(8) { width: 100px; min-width: 80px; } /* Status */
     .modal-table tr:hover {
       background-color: #f1f1f1;
     }
@@ -358,7 +361,7 @@
         margin: 0mm 5mm;
         padding: 5mm;
         width: auto;
-        max-width: 100%;
+        max-width: 1200px; /* ปรับความกว้างในโหมดพิมพ์ให้สอดคล้อง */
         box-shadow: none;
         border-radius: 0;
       }
@@ -383,8 +386,11 @@
       .modal-table th:nth-child(1), .modal-table td:nth-child(1) { width: 30mm; min-width: 20mm; } /* รหัสสาขา */
       .modal-table th:nth-child(2), .modal-table td:nth-child(2) { width: 40mm; min-width: 30mm; } /* TID */
       .modal-table th:nth-child(3), .modal-table td:nth-child(3) { width: 25mm; min-width: 15mm; } /* PosNo */
-      .modal-table th:nth-child(4), .modal-table td:nth-child(4) { width: 40mm; min-width: 30mm; } /* วันที่ส่งคืน */
-      .modal-table th:nth-child(5), .modal-table td:nth-child(5) { width: 30mm; min-width: 20mm; } /* Status */
+      .modal-table th:nth-child(4), .modal-table td:nth-child(4) { width: 40mm; min-width: 30mm; } /* สถานะร้าน */
+      .modal-table th:nth-child(5), .modal-table td:nth-child(5) { width: 40mm; min-width: 30mm; } /* วันเข้าดำเนินการ */
+      .modal-table th:nth-child(6), .modal-table td:nth-child(6) { width: 40mm; min-width: 30mm; } /* วันที่ส่งคืน */
+      .modal-table th:nth-child(7), .modal-table td:nth-child(7) { width: 40mm; min-width: 30mm; } /* ผู้ส่งคืน */
+      .modal-table th:nth-child(8), .modal-table td:nth-child(8) { width: 30mm; min-width: 20mm; } /* Status */
       #modalContent > div {
         margin-bottom: 2mm;
         font-size: 10pt;
@@ -427,7 +433,7 @@
           <th class="sortable" data-column="รหัสสาขา">รหัสสาขา <span class="arrow"></span></th>
           <th class="sortable" data-column="สาขา">สาขา <span class="arrow"></span></th>
           <th class="sortable" data-column="จังหวัด">จังหวัด <span class="arrow"></span></th>
-          <th class="sortable" data-column="Remark">Remark <span class="arrow"></span></th>
+          <th class="sortable" data-column="สถานะร้าน">สถานะร้าน <span class="arrow"></span></th>
           <th class="sortable" data-column="จำนวนเครื่อง">จำนวนเครื่อง <span class="arrow"></span></th>
           <th class="sortable" data-column="ส่งคืน">ส่งคืน <span class="arrow"></span></th>
           <th class="sortable" data-column="ผ่านมา(วัน)">ผ่านมา(วัน) <span class="arrow"></span></th>
@@ -507,7 +513,6 @@
     let sortColumn = null;
     let sortDirection = 'asc';
 
-    // ฟังก์ชันแปลงวันที่ให้อยู่ในรูปแบบที่ JavaScript รู้จัก
     function parseDate(dateStr) {
       if (!dateStr || dateStr.trim() === "") return null;
       const parts = dateStr.includes('/') ? dateStr.split('/') : dateStr.split('-');
@@ -523,7 +528,6 @@
       return null;
     }
 
-    // ฟังก์ชันคำนวณสรุปสถานะ
     function updateStatusSummary(data) {
       const waiting = data.filter(row => row["Staus"] === "รอส่งคลัง");
       const complete = data.filter(row => row["Staus"] === "ครบ");
@@ -551,7 +555,6 @@
       pendingPosCount.textContent = pendingPos;
     }
 
-    // ฟังก์ชันเรียงลำดับข้อมูล
     function sortData(data, column, direction) {
       return [...data].sort((a, b) => {
         let valueA = a[column] || "";
@@ -579,9 +582,8 @@
       });
     }
 
-    // ฟังก์ชันส่งออกข้อมูลเป็น CSV
     function exportToCSV(data) {
-      const headers = ["สถานะ", "รหัสสาขา", "สาขา", "จังหวัด", "Remark", "จำนวนเครื่อง", "ส่งคืน", "ผ่านมา(วัน)", "วันที่ดำเนินการ", "ผู้ส่งคืน", "วันที่คืนคลัง"];
+      const headers = ["สถานะ", "รหัสสาขา", "สาขา", "จังหวัด", "สถานะร้าน", "จำนวนเครื่อง", "ส่งคืน", "ผ่านมา(วัน)", "วันที่ดำเนินการ", "ผู้ส่งคืน", "วันที่คืนคลัง"];
       const rows = data.map(row => 
         headers.map(header => {
           let value = row[header] || "";
@@ -589,6 +591,8 @@
             value = parseFloat(value) === 0 ? "-" : value;
           } else if (header === "ผ่านมา(วัน)") {
             value = parseInt(value.replace(" วัน", "")) === 0 ? "-" : value;
+          } else if (header === "สถานะร้าน") {
+            value = value || "ไม่มีข้อมูล";
           }
           return `"${value.toString().replace(/"/g, '""')}"`;
         }).join(',')
@@ -627,7 +631,7 @@
           (row["สาขา"] || "").toLowerCase().includes(keyword) ||
           (row["จังหวัด"] || "").toLowerCase().includes(keyword) ||
           (row["ผู้ส่งคืน"] || "").toLowerCase().includes(keyword) ||
-          (row["Remark"] || "").toLowerCase().includes(keyword) ||
+          (row["สถานะร้าน"] || "").toLowerCase().includes(keyword) ||
           (row["วันที่คืนคลัง"] || "").toLowerCase().includes(keyword)
         );
         const matchesStatus = !status || (row["Staus"] || "") === status;
@@ -668,7 +672,7 @@
           (row["สาขา"] || "").toLowerCase().includes(keyword) ||
           (row["จังหวัด"] || "").toLowerCase().includes(keyword) ||
           (row["ผู้ส่งคืน"] || "").toLowerCase().includes(keyword) ||
-          (row["Remark"] || "").toLowerCase().includes(keyword) ||
+          (row["สถานะร้าน"] || "").toLowerCase().includes(keyword) ||
           (row["วันที่คืนคลัง"] || "").toLowerCase().includes(keyword)
         );
         const rowStatus = row["Staus"] || "";
@@ -696,7 +700,7 @@
         const tr = document.createElement("tr");
         tr.style.animationDelay = `${i * 0.05}s`;
 
-        const columns = ["Staus", "รหัสสาขา", "สาขา", "จังหวัด", "Remark", "จำนวนเครื่อง", "ส่งคืน", "ผ่านมา(วัน)", "วันที่ดำเนินการ", "ผู้ส่งคืน", "วันที่คืนคลัง"];
+        const columns = ["Staus", "รหัสสาขา", "สาขา", "จังหวัด", "สถานะร้าน", "จำนวนเครื่อง", "ส่งคืน", "ผ่านมา(วัน)", "วันที่ดำเนินการ", "ผู้ส่งคืน", "วันที่คืนคลัง"];
         columns.forEach(col => {
           const td = document.createElement("td");
           let value = row[col] || "";
@@ -707,6 +711,8 @@
             td.textContent = parseFloat(value) === 0 ? "-" : value;
           } else if (col === "ผ่านมา(วัน)") {
             td.textContent = parseInt(value.replace(" วัน", "")) === 0 ? "-" : value;
+          } else if (col === "สถานะร้าน") {
+            td.textContent = value || "ไม่มีข้อมูล";
           } else {
             td.textContent = value;
           }
@@ -730,7 +736,10 @@
                     <th>รหัสสาขา</th>
                     <th>TID</th>
                     <th>PosNo</th>
+                    <th>สถานะร้าน</th>
+                    <th>วันเข้าดำเนินการ</th>
                     <th>วันที่ส่งคืน</th>
+                    <th>ผู้ส่งคืน</th>
                     <th>Status</th>
                   </tr>
                 </thead>
@@ -740,7 +749,10 @@
                       <td>${tscRow["รหัสสาขา"] || ""}</td>
                       <td>${tscRow["TID"] || ""}</td>
                       <td>${tscRow["PosNo"] || ""}</td>
+                      <td>${tscRow["สถานะร้าน"] || "ไม่มีข้อมูล"}</td>
+                      <td>${tscRow["วันเข้าดำเนินการ"] || "ไม่มีข้อมูล"}</td>
                       <td>${tscRow["DateRecripte"] || ""}</td>
+                      <td>${tscRow["ผู้ส่งคืน"] || "ไม่มีข้อมูล"}</td>
                       <td class="${tscRow["Status"] === "รอส่งคืน" ? "status-red" : tscRow["Status"] === "ส่งคืนแล้ว" ? "status-green" : tscRow["Status"] === "รอจัดเก็บ" ? "status-orange" : ""}">${tscRow["Status"] || ""}</td>
                     </tr>
                   `).join('')}
@@ -753,8 +765,10 @@
 
           modalContent.innerHTML = columns.map(col => {
             const label = col === "Staus" ? "สถานะ" : col === "จำนวนเครื่อง" ? "จำนวนเครื่อง" : col === "ส่งคืน" ? "ส่งคืน" : col === "ผู้ส่งคืน" ? "ผู้ส่งคืน" : col === "ผ่านมา(วัน)" ? "ผ่านมา(วัน)" : col === "วันที่คืนคลัง" ? "วันที่คืนคลัง" : col === "วันที่ดำเนินการ" ? "วันที่ดำเนินการ" : col;
-            let value = row[col] || (col === "Staus" ? "ไม่มีข้อมูล" : "");
-            if (col === "จำนวนเครื่อง" || col === "ส่งคืน") {
+            let value = row[col] || "";
+            if (col === "Staus" || col === "สถานะร้าน") {
+              value = value || "ไม่มีข้อมูล";
+            } else if (col === "จำนวนเครื่อง" || col === "ส่งคืน") {
               value = parseFloat(value) === 0 ? "-" : value;
             } else if (col === "ผ่านมา(วัน)") {
               value = parseInt(value.replace(" วัน", "")) === 0 ? "-" : value;
@@ -815,14 +829,13 @@
       filterAndRenderTable();
     };
 
-    // Fetch data from both sheets
     Promise.all([
       fetch(url).then(response => response.json()),
       fetch(tscDataUrl).then(response => response.json())
     ])
       .then(([brandData, tscDataResponse]) => {
         console.log("ข้อมูลจาก TscBrand:", brandData);
-        console.log("ข้อมูลจาก TSCData:", tscDataResponse);
+        brandData.forEach(row => console.log("สถานะร้าน:", row["Remark"]));
         allData = brandData.map(row => ({
           ...row,
           "จำนวนเครื่อง": row["PosQty"] || "",
@@ -830,7 +843,7 @@
           "ผู้ส่งคืน": row["UserKeep"] || "",
           "ผ่านมา(วัน)": row["ผ่านมา"] || "",
           "Staus": (row["Staus"] || "").trim(),
-          "Remark": row["Remark"] || "",
+          "สถานะร้าน": row["Remark"] || "ไม่มีข้อมูล",
           "วันที่คืนคลัง": row["DateRecripte"] || "",
           "วันที่ดำเนินการ": row["DateCall"] || ""
         }));
@@ -838,9 +851,13 @@
           "รหัสสาขา": row["รหัสสาขา"] || "",
           "TID": row["TID"] || "",
           "PosNo": row["PosNo"] || "",
+          "สถานะร้าน": row["สถานะร้าน"] || "ไม่มีข้อมูล",
+          "วันเข้าดำเนินการ": row["วันเข้าดำเนินการ"] || "ไม่มีข้อมูล",
           "DateRecripte": row["DateRecripte"] || "",
+          "ผู้ส่งคืน": row["Employee"] || "ไม่มีข้อมูล",
           "Status": row["Status"] || ""
         }));
+        console.log("ข้อมูลจาก TSCData:", tscData); // ดีบัก TSCData
         filterAndRenderTable();
       })
       .catch(error => {
