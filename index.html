@@ -78,38 +78,72 @@
     }
     .status-card {
       flex: 1;
-      min-width: 200px;
-      padding: 15px;
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      min-width: 220px;
+      padding: 20px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(248,250,252,0.9));
+      border-radius: 16px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1), 0 2px 10px rgba(0,0,0,0.05);
       text-align: center;
       cursor: pointer;
-      transition: transform 0.3s ease;
-      font-size: 14px;
-      font-weight: bold;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-size: 16px;
+      font-weight: 600;
+      position: relative;
+      overflow: hidden;
+      border: none;
+    }
+    .status-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--card-color), var(--card-color));
     }
     .status-card:hover {
-      transform: translateY(-5px);
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.15), 0 4px 15px rgba(0,0,0,0.08);
+    }
+    .status-card i {
+      font-size: 32px;
+      margin-bottom: 12px;
+      display: block;
+      opacity: 0.9;
+      color: var(--card-color);
+    }
+    .status-card .status-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--card-color);
+    }
+    .status-card .branch-count {
+      font-size: 16px;
+      margin-bottom: 4px;
+      color: var(--card-color);
+    }
+    .status-card .machine-count {
+      font-size: 14px;
+      opacity: 0.9;
+      color: var(--card-color);
     }
     .status-card.waiting { 
-      border-left: 5px solid #e74c3c; 
-      color: #e74c3c;
+      --card-color: #e74c3c;
     }
     .status-card.complete { 
-      border-left: 5px solid #2ecc71; 
-      color: #2ecc71;
+      --card-color: #2ecc71;
     }
     .status-card.incomplete { 
-      border-left: 5px solid #f1c40f; 
-      color: #f1c40f;
+      --card-color: #f1c40f;
     }
     .status-card.pending { 
-      border-left: 5px solid #e67e22; 
-      color: #e67e22;
+      --card-color: #e67e22;
     }
-    .status-card div {
-      margin: 5px 0;
+    .status-card.active {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.15), 0 4px 15px rgba(0,0,0,0.08);
+      background: linear-gradient(135deg, rgba(255,255,255,1), rgba(248,250,252,1));
     }
     .table-container {
       overflow-x: auto;
@@ -439,24 +473,28 @@
   </div>
   <div id="statusSummary">
     <div class="status-card waiting" onclick="filterByStatus('รอส่งคลัง')">
-      <div>รอส่งคลัง</div>
-      <div><span id="waitingCount">0</span> สาขา</div>
-      <div>จำนวน <span id="waitingPosCount">0</span> เครื่อง</div>
+      <i class="fas fa-clock"></i>
+      <div class="status-title">รอส่งคลัง</div>
+      <div class="branch-count"><span id="waitingCount">0</span> สาขา</div>
+      <div class="machine-count">จำนวน <span id="waitingPosCount">0</span> เครื่อง</div>
     </div>
     <div class="status-card incomplete" onclick="filterByStatus('ไม่ครบ')">
-      <div>ไม่ครบ</div>
-      <div><span id="incompleteCount">0</span> สาขา</div>
-      <div>จำนวน <span id="incompletePosCount">0</span> เครื่อง</div>
+      <i class="fas fa-exclamation-triangle"></i>
+      <div class="status-title">ไม่ครบ</div>
+      <div class="branch-count"><span id="incompleteCount">0</span> สาขา</div>
+      <div class="machine-count">จำนวน <span id="incompletePosCount">0</span> เครื่อง</div>
     </div>
     <div class="status-card pending" onclick="filterByStatus('รอจัดเก็บ')">
-      <div>รอจัดเก็บ</div>
-      <div><span id="pendingCount">0</span> สาขา</div>
-      <div>จำนวน <span id="pendingPosCount">0</span> เครื่อง</div>
+      <i class="fas fa-hourglass-half"></i>
+      <div class="status-title">รอจัดเก็บ</div>
+      <div class="branch-count"><span id="pendingCount">0</span> สาขา</div>
+      <div class="machine-count">จำนวน <span id="pendingPosCount">0</span> เครื่อง</div>
     </div>
     <div class="status-card complete" onclick="filterByStatus('ครบ')">
-      <div>ครบ</div>
-      <div><span id="completeCount">0</span> สาขา</div>
-      <div>จำนวน <span id="completePosCount">0</span> เครื่อง</div>
+      <i class="fas fa-check-circle"></i>
+      <div class="status-title">ครบ</div>
+      <div class="branch-count"><span id="completeCount">0</span> สาขา</div>
+      <div class="machine-count">จำนวน <span id="completePosCount">0</span> เครื่อง</div>
     </div>
   </div>
   <div class="table-container">
@@ -550,6 +588,10 @@
     function filterByStatus(status) {
       statusFilter.value = status;
       searchInput.value = '';
+      // Remove active class from all cards
+      document.querySelectorAll('.status-card').forEach(card => card.classList.remove('active'));
+      // Add active class to clicked card
+      event.currentTarget.classList.add('active');
       filterAndRenderTable();
     }
 
