@@ -78,19 +78,20 @@
     }
     .status-card {
       flex: 1;
-      min-width: 220px;
-      padding: 20px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(248,250,252,0.9));
-      border-radius: 16px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.1), 0 2px 10px rgba(0,0,0,0.05);
+      min-width: 120px;
+      padding: 12px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(248,250,252,0.95));
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.05);
       text-align: center;
       cursor: pointer;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      font-size: 16px;
-      font-weight: 600;
+      font-size: 12px;
+      font-weight: 500;
       position: relative;
       overflow: hidden;
       border: none;
+      border: 2px solid transparent;
     }
     .status-card::before {
       content: '';
@@ -98,35 +99,34 @@
       top: 0;
       left: 0;
       right: 0;
-      height: 4px;
+      height: 3px;
       background: linear-gradient(90deg, var(--card-color), var(--card-color));
+      opacity: 0.8;
     }
     .status-card:hover {
-      transform: translateY(-8px) scale(1.02);
-      box-shadow: 0 12px 35px rgba(0,0,0,0.15), 0 4px 15px rgba(0,0,0,0.08);
-    }
-    .status-card i {
-      font-size: 32px;
-      margin-bottom: 12px;
-      display: block;
-      opacity: 0.9;
-      color: var(--card-color);
+      transform: translateY(-5px) scale(1.03);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.15), 0 4px 15px rgba(0,0,0,0.08);
+      border-color: var(--card-color);
+      background: linear-gradient(135deg, rgba(255,255,255,1), rgba(248,250,252,0.98));
     }
     .status-card .status-title {
-      font-size: 18px;
+      font-size: 14px;
       font-weight: 700;
-      margin-bottom: 8px;
-      color: var(--card-color);
-    }
-    .status-card .branch-count {
-      font-size: 16px;
       margin-bottom: 4px;
       color: var(--card-color);
+      line-height: 1.2;
+    }
+    .status-card .branch-count {
+      font-size: 12px;
+      margin-bottom: 2px;
+      color: var(--card-color);
+      font-weight: 600;
     }
     .status-card .machine-count {
-      font-size: 14px;
+      font-size: 10px;
       opacity: 0.9;
       color: var(--card-color);
+      line-height: 1.1;
     }
     .status-card.waiting { 
       --card-color: #e74c3c;
@@ -141,9 +141,10 @@
       --card-color: #e67e22;
     }
     .status-card.active {
-      transform: translateY(-8px) scale(1.02);
-      box-shadow: 0 12px 35px rgba(0,0,0,0.15), 0 4px 15px rgba(0,0,0,0.08);
+      transform: translateY(-5px) scale(1.03);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.15), 0 4px 15px rgba(0,0,0,0.08);
       background: linear-gradient(135deg, rgba(255,255,255,1), rgba(248,250,252,1));
+      border-color: var(--card-color);
     }
     .table-container {
       overflow-x: auto;
@@ -235,42 +236,60 @@
       height: 100%;
       overflow: auto;
       background-color: rgba(0,0,0,0.5);
+      backdrop-filter: blur(5px);
     }
     .modal-content {
       background-color: #fff;
-      margin: 10% auto;
-      padding: 20px;
-      border-radius: 12px;
+      margin: 5% auto;
+      padding: 25px;
+      border-radius: 16px;
       width: 90%;
-      max-width: 1200px; /* เพิ่มความกว้างจาก 900px เป็น 1200px */
-      animation: zoomIn 0.4s ease;
+      max-width: 1200px;
+      animation: zoomIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      border: 1px solid rgba(255,255,255,0.2);
     }
     .modal-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #e0e0e0;
     }
     .close {
       color: #aaa;
-      font-size: 24px;
+      font-size: 28px;
       font-weight: bold;
       cursor: pointer;
+      transition: color 0.3s ease;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .close:hover {
       color: #000;
+      background-color: #f0f0f0;
     }
     .print-button {
       background-color: #555;
       color: white;
       border: none;
-      border-radius: 6px;
-      padding: 6px 12px;
+      border-radius: 8px;
+      padding: 8px 14px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
     .print-button:hover {
       background-color: #333;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
     #modalContent span.label {
       color: #007bff;
@@ -285,9 +304,11 @@
       margin-top: 20px;
       border: 1px solid #ccc;
       overflow-x: auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     }
     .modal-table th, .modal-table td {
-      padding: 8px;
+      padding: 10px;
       text-align: left;
       border-bottom: 1px solid #e0e0e0;
       border-right: 1px solid #ccc;
@@ -305,13 +326,17 @@
     .modal-table th:nth-child(7), .modal-table td:nth-child(7) { width: 150px; min-width: 120px; } /* ผู้ส่งคืน */
     .modal-table th:nth-child(8), .modal-table td:nth-child(8) { width: 100px; min-width: 80px; } /* Status */
     .modal-table tr:hover {
-      background-color: #f1f1f1;
+      background-color: #f8f9fa;
     }
     .no-data {
       margin-top: 20px;
       color: #e74c3c;
       font-weight: bold;
       text-align: center;
+      padding: 20px;
+      background-color: #f8d7da;
+      border-radius: 8px;
+      border: 1px solid #f5c6cb;
     }
     .pagination {
       display: flex;
@@ -388,7 +413,7 @@
     @keyframes zoomIn {
       from {
         opacity: 0;
-        transform: scale(0.8);
+        transform: scale(0.9);
       }
       to {
         opacity: 1;
@@ -413,7 +438,7 @@
         margin: 0mm 5mm;
         padding: 5mm;
         width: auto;
-        max-width: 1200px; /* ปรับความกว้างในโหมดพิมพ์ให้สอดคล้อง */
+        max-width: 1200px;
         box-shadow: none;
         border-radius: 0;
       }
@@ -473,25 +498,21 @@
   </div>
   <div id="statusSummary">
     <div class="status-card waiting" onclick="filterByStatus('รอส่งคลัง')">
-      <i class="fas fa-clock"></i>
       <div class="status-title">รอส่งคลัง</div>
       <div class="branch-count"><span id="waitingCount">0</span> สาขา</div>
       <div class="machine-count">จำนวน <span id="waitingPosCount">0</span> เครื่อง</div>
     </div>
     <div class="status-card incomplete" onclick="filterByStatus('ไม่ครบ')">
-      <i class="fas fa-exclamation-triangle"></i>
       <div class="status-title">ไม่ครบ</div>
       <div class="branch-count"><span id="incompleteCount">0</span> สาขา</div>
       <div class="machine-count">จำนวน <span id="incompletePosCount">0</span> เครื่อง</div>
     </div>
     <div class="status-card pending" onclick="filterByStatus('รอจัดเก็บ')">
-      <i class="fas fa-hourglass-half"></i>
       <div class="status-title">รอจัดเก็บ</div>
       <div class="branch-count"><span id="pendingCount">0</span> สาขา</div>
       <div class="machine-count">จำนวน <span id="pendingPosCount">0</span> เครื่อง</div>
     </div>
     <div class="status-card complete" onclick="filterByStatus('ครบ')">
-      <i class="fas fa-check-circle"></i>
       <div class="status-title">ครบ</div>
       <div class="branch-count"><span id="completeCount">0</span> สาขา</div>
       <div class="machine-count">จำนวน <span id="completePosCount">0</span> เครื่อง</div>
@@ -524,7 +545,7 @@
       <div class="modal-header">
         <h2>ใบคืนเครื่อง TSC</h2>
         <div>
-          <button class="print-button" onclick="window.print()"><i class="fas fa-print"></i></button>
+          <button class="print-button" onclick="window.print()"><i class="fas fa-print"></i> พิมพ์</button>
           <span class="close" id="closeModal">&times;</span>
         </div>
       </div>
