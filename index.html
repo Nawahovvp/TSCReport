@@ -4,6 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>รายการสาขา</title>
+  <!-- Enhanced Content Security Policy to reduce phishing risks -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://unpkg.com https://code.jquery.com https://opensheet.elk.sh https://docs.google.com https://script.google.com https://script.googleusercontent.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https: blob: https://drive.google.com https://lh3.googleusercontent.com; connect-src 'self' https://opensheet.elk.sh https://docs.google.com https://script.google.com https://script.googleusercontent.com; frame-src https://docs.google.com https://drive.google.com; object-src 'none'; base-uri 'self'; form-action 'self' https://docs.google.com;">
+    <!-- Additional security headers via meta -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <!-- Removed invalid X-Frame-Options meta; set via server if needed -->
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <!-- Verification meta to help with Safe Browsing (add your site verification if available) -->
+    <meta name="google-site-verification" content="your-verification-token-if-any">
+    <!-- Clear description to indicate legitimacy -->
+    <meta name="description" content="ระบบข้อมูลภายในบริษัทยเท่านั้น - เครื่องมือสำหรับพนักงานเท่านั้น ไม่ใช่เว็บไซต์ภายนอก">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <style>
     body {
@@ -1013,4 +1024,5 @@
   </script>
 </body>
 </html>
+
 
